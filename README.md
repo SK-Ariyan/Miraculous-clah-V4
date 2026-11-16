@@ -1,189 +1,121 @@
-# 🐞 Miraculous Clash (V1)
+# ✨ MIRACULOUS CLASH v4.0
 
-A turn-based strategy battle game inspired by the Miraculous universe.
+### A Fan-Made Browser-Based Fighting Game
 
-Players build a team of five Kwamis, each with unique stats, active abilities, passive abilities, and powerful synergies. Every battle requires planning, timing, and strategy rather than luck alone.
+Miraculous Clash is a fan-made browser game inspired by the Miraculous universe. It combines strategic battles, character abilities, AI-driven opponents, interactive interfaces, and immersive audio-visual elements.
 
-> **Current Version:** v1.1 (Core Gameplay Complete)
-
----
-
-# 🎮 Features
-
-## ⚔️ Turn-Based Combat
-
-* Normal attacks
-* Ability-based combat
-* Cooldown system
-* Speed determines the first turn
-* Extra turns
-* Double attacks
+Version 4.0 marks a major milestone in the project's development, bringing together improved battle mechanics, expanded character assets, AI systems, and a more complete game interface.
 
 ---
 
-## 🐾 18 Playable Kwamis
+## 👨‍💻 Creators
 
-Each Kwami has:
+**Created and developed by:**
+- **SK Ariyan** — Lead Developer & Project Creator
 
-* HP
-* Damage
-* Speed
-* Active Ability
-* Passive Ability
-* Cooldown
-
-Current roster:
-
-* Tikki
-* Plagg
-* Wayz
-* Trixx
-* Pollen
-* Roaar
-* Longg
-* Kaalki
-* Fluff
-* Sass
-* Daizzi
-* Mullo
-* Nooroo
-* Orikko
-* Stompp
-* Tussoo
-* Xuppu
-* Ziggy
+*Developed as an independent game development project.*
 
 ---
 
-# ✨ Battle Mechanics
+## 🛠️ Tools & Technologies Used
 
-Implemented mechanics include:
-
-* Healing
-* True Damage
-* Shields
-* Shield Break
-* Damage Buff
-* Damage Reduction
-* Regeneration
-* Dodge
-* Immunity
-* Freeze
-* Stun
-* Passive Abilities
-* Ability Boost
-* Floating Damage Numbers
-* Battle Log
-* Health Bars
-* Cooldown Reduction
+| Technology / Tool | Purpose |
+|---|---|
+| HTML5 | Game structure and pages |
+| CSS3 | Styling, layouts and animations |
+| JavaScript | Game logic and interactions |
+| Visual Studio Code | Development environment |
+| Git & GitHub | Version control and project hosting |
+| Google Gemini | AI assistance and creative asset generation |
+| Image Editing Tools | Character sprites and visual assets |
 
 ---
 
-# 🤝 Team Synergies
+## 🎮 Features in v4.0
 
-Special combinations unlock unique effects.
+### ⚔️ Battle System
+- Turn-based combat mechanics.
+- Health tracking and battle management.
+- Attack and damage effects.
+- Battle animations and visual feedback.
+- Combat decision-making systems.
 
-Current synergies include:
+### 🧠 AI System
+- AI-based battle decision-making.
+- Hero behaviour and personality modules.
+- Battle evaluation and threat detection.
+- Combo analysis and planning.
+- Strategic move scoring.
 
-* 🐞 Creation & Destruction
-* 🐉 Dragon Rider
-* 🎭 Chaos Illusion
-* 🛡 Guardian
-* ⏳ Time Loop
+### 🦸 Hero Collection
+- Multiple unique heroes.
+- Individual character sprites.
+- Separate normal, attack and hurt appearances.
+- Character-related data and abilities.
 
-More synergies are planned for future versions.
+### 🐞 Kwami System
+- Kwami collection and information.
+- Dedicated Kwami interface.
+- Character-related interactions.
 
----
+### 🖥️ Interactive UI
+- Home page and navigation.
+- Lobby interface.
+- Hero selection and draft interface.
+- Avatar section.
+- Settings page.
+- Credits page.
+- Interactive buttons and cooldown indicators.
+- Health bars and visual feedback.
+- Page transitions and animations.
 
-# 📸 Current Screens
-
-* Home Screen
-* Team Draft Screen
-* Battle Screen
-
----
-
-# 🚧 Planned Features (Version 2)
-
-* Avatar Selection
-* Username Selection
-* VS Screen
-* Victory Screen
-* Defeat Screen
-* Improved Draft UI
-* Better Battle Animations
-* Sound Effects
-* Background Music
-* Improved Visual Effects
-
----
-
-# 🌟 Future Plans
-
-* More Kwamis
-* More Synergies
-* Ranked Battles
-* AI Opponent
-* Story Mode
-* Achievement System
-* Battle Statistics
-* Save Progress
-* Online Multiplayer (Long-term goal)
-* Mobile-friendly Interface
+### 🔊 Audio & Visual Experience
+- Background music.
+- Battle sound effects.
+- Character voice clips.
+- Arena backgrounds.
+- Animated visual effects.
 
 ---
 
-# ⚠️ Known Limitations
+## 🚀 Upcoming Features
 
-Current version is focused on gameplay.
+The following features are planned for future versions:
 
-Still missing:
+- **Multiplayer Battles:** Play against other players online.
+- **Improved AI:** More intelligent and adaptive opponents.
+- **New Heroes:** Additional characters with unique abilities.
+- **Advanced Combat:** More abilities, combos and battle mechanics.
+- **Improved Animations:** Smoother attacks, damage effects and transitions.
+- **Enhanced UI:** More interactive menus and improved visual design.
+- **Battle Improvements:** More strategic gameplay and refined mechanics.
 
-* Sound effects
-* Music
-* Avatar customization
-* Username system
-* Save files
-* AI opponents
-* Multiplayer
-* Polish animations
-
-These will be added gradually.
+*Upcoming features are planned and may change during development.*
 
 ---
 
-# 🛠 Built With
+## 📌 Project Information
 
-* HTML5
-* CSS3
-* JavaScript (Vanilla)
-
-No external frameworks are currently used.
-
----
-
-# 📈 Project Status
-
-**Version:** v1.1
-
-✅ Core gameplay complete
-
-The combat engine, abilities, passive effects, synergies, cooldown system, and battle mechanics are stable after multiple test matches.
-
-Future updates will mainly focus on improving presentation, user experience, and adding new content.
+| Detail | Information |
+|---|---|
+| Project Name | Miraculous Clash |
+| Current Version | 4.0 |
+| Project Type | Browser-Based Fighting Game |
+| Platform | Web Browser |
+| Language | JavaScript |
+| Development Status | Ongoing |
 
 ---
 
-# 👨‍💻 Developer
+## ❤️ A Note from the Creator
 
-Created by **SK Ariyan**
+Miraculous Clash started as a small game development idea and has gradually grown into a project involving game mechanics, AI, character systems, animations, and interactive UI.
 
-This project is a personal learning journey to improve skills in JavaScript, game logic, UI design, and software development while building a complete strategy game from scratch.
+Version 4.0 is another step forward. There is still a lot to build, improve, and explore.
+
+**The clash has only just begun!**
 
 ---
 
-# ⭐ Support
-
-If you like this project, consider giving it a ⭐ on GitHub.
-
-Feedback, suggestions, and bug reports are always welcome.
+### ✨ MIRACULOUS CLASH v4.0
+**Created by SK Ariyan**
