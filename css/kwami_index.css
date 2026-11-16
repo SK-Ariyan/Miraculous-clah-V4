@@ -1,0 +1,434 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    padding: 20px;
+
+    font-family: 'Segoe UI', sans-serif;
+    color: #f5eaff;
+
+    background:
+        radial-gradient(ellipse at 20% 30%, #32145a 0%, transparent 40%),
+        radial-gradient(ellipse at 85% 80%, #24103f 0%, transparent 40%),
+        #090612;
+}
+
+/* BACK BUTTON */
+
+#backBtn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+
+    padding: 10px 20px;
+
+    color: #e9d5ff;
+    background: #1b1030;
+
+    border: 1px solid #9333ea;
+    border-radius: 10px;
+
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#backBtn:hover {
+    background: #7e22ce;
+    box-shadow: 0 0 18px #a855f7;
+}
+
+/* MAIN CODEX */
+
+.container {
+    max-width: 1150px;
+    margin: 30px auto;
+    padding: 25px;
+
+    display: grid;
+    grid-template-columns: 0.9fr 1.5fr;
+    grid-template-areas:
+        "heading heading"
+        "navigation navigation"
+        "image active"
+        "favorite passive"
+        "title synergy"
+        "gallery gallery"
+        "stats stats";
+
+    gap: 14px;
+
+    background: rgba(19, 10, 33, 0.9);
+
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    border-radius: 22px;
+
+    box-shadow: 0 0 35px rgba(126, 34, 206, 0.2);
+}
+
+/* HEADING */
+
+.container > h1 {
+    grid-area: heading;
+
+    text-align: center;
+    font-size: 30px;
+    letter-spacing: 2px;
+
+    color: #e9d5ff;
+    text-shadow: 0 0 15px #9333ea;
+}
+
+/* NAVIGATION */
+
+.navigation {
+    grid-area: navigation;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+
+    padding: 12px;
+
+    background: #160d27;
+    border: 1px solid #512879;
+    border-radius: 14px;
+}
+
+.navigation h2 {
+    min-width: 180px;
+    text-align: center;
+
+    color: #d8b4fe;
+    font-size: 25px;
+}
+
+#prevBtn,
+#nextBtn {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+    border: 1px solid #c084fc;
+
+    background: #32164f;
+    color: white;
+
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+#prevBtn:hover,
+#nextBtn:hover {
+    background: #9333ea;
+    box-shadow: 0 0 15px #a855f7;
+    transform: scale(1.1);
+}
+
+/* KWAMI SHOWCASE */
+
+#kwamiImage {
+    grid-area: image;
+
+    width: 100%;
+    height: 260px;
+
+    object-fit: contain;
+    padding: 15px;
+
+    background:
+        radial-gradient(circle, #48206e 0%, #1b1030 65%, #10091c 100%);
+
+    border: 2px solid #a855f7;
+    border-radius: 18px;
+
+    box-shadow:
+        0 0 15px rgba(168, 85, 247, 0.5),
+        inset 0 0 20px rgba(168, 85, 247, 0.15);
+}
+
+/* FAVORITE */
+
+#favoriteBtn {
+    grid-area: favorite;
+
+    padding: 12px;
+
+    background: linear-gradient(135deg, #7134a8, #3b185e);
+    color: #fff0bd;
+
+    border: 1px solid #d8b4fe;
+    border-radius: 12px;
+
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#favoriteBtn:hover {
+    box-shadow: 0 0 18px #a855f7;
+    transform: translateY(-2px);
+}
+
+/* TITLE */
+
+#kwamiTitle {
+    grid-area: title;
+
+    text-align: center;
+    color: #c084fc;
+    font-size: 18px;
+}
+
+/* INFORMATION CARDS */
+
+.section {
+    padding: 17px;
+
+    background: linear-gradient(145deg, #241339, #160d27);
+
+    border: 1px solid #63358a;
+    border-radius: 15px;
+
+    transition: 0.25s;
+}
+
+.section:hover {
+    border-color: #c084fc;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.2);
+    transform: translateY(-2px);
+}
+
+.section h2 {
+    color: #d8b4fe;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.section h3 {
+    color: #c084fc;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.section h4 {
+    color: #e9d5ff;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.section p {
+    color: #d1c2e0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ACTIVE CARD */
+
+.section:nth-of-type(4) {
+    grid-area: active;
+}
+
+/* PASSIVE CARD */
+
+.section:nth-of-type(5) {
+    grid-area: passive;
+}
+
+/* SYNERGY CARD */
+
+.section:nth-of-type(6) {
+    grid-area: synergy;
+}
+
+/* PARTNER IMAGE */
+
+#partnerImage {
+    width: 75px;
+    height: 75px;
+
+    object-fit: contain;
+
+    padding: 5px;
+    margin: 5px 0;
+
+    background: #10091c;
+    border: 1px solid #a855f7;
+    border-radius: 12px;
+}
+
+/* STATS */
+
+#stats {
+    color: #d8b4fe;
+    line-height: 1.8;
+}
+
+/* KWAMI GALLERY */
+
+#kwamiStrip {
+    grid-area: gallery;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+
+    padding: 15px;
+
+    background: #10091c;
+    border: 1px solid #512879;
+    border-radius: 15px;
+}
+
+#kwamiStrip img {
+    width: 55px;
+    height: 55px;
+
+    object-fit: contain;
+    padding: 5px;
+
+    background: #241339;
+    border: 1px solid #7540a5;
+    border-radius: 12px;
+
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+#kwamiStrip img:hover {
+    transform: scale(1.15);
+    border-color: #d8b4fe;
+    box-shadow: 0 0 15px #a855f7;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        margin-top: 55px;
+    }
+
+    .container > h1 {
+        font-size: 23px;
+    }
+
+    #kwamiImage {
+        height: 220px;
+    }
+
+    .navigation h2 {
+        min-width: 120px;
+        font-size: 21px;
+    }
+
+    #backBtn {
+        top: 8px;
+        left: 8px;
+    }
+}
+
+/* =================================
+   CODEX LAYOUT ADJUSTMENTS
+================================= */
+
+.container {
+    max-width: 1000px;
+    padding: 20px;
+    gap: 10px;
+
+    grid-template-areas:
+        "heading heading"
+        "navigation navigation"
+        "image active"
+        "title synergy"
+        "passive synergy"
+        "favorite stats"
+        "gallery gallery";
+}
+
+/* Correct section positioning using their HTML IDs */
+
+.section:has(#activeName) {
+    grid-area: active;
+}
+
+.section:has(#passiveEffect) {
+    grid-area: passive;
+}
+
+.section:has(#partnerImage) {
+    grid-area: synergy;
+}
+
+.section:has(#stats) {
+    grid-area: stats;
+}
+
+/* Smaller Kwami preview */
+
+#kwamiImage {
+    height: 220px;
+    padding: 10px;
+}
+
+/* More compact information cards */
+
+.section {
+    padding: 12px 15px;
+    margin: 0;
+}
+
+.section h2 {
+    font-size: 16px;
+    margin-bottom: 7px;
+}
+
+.section p {
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+/* Smaller partner image */
+
+#partnerImage {
+    width: 65px;
+    height: 65px;
+}
+
+/* Compact gallery */
+
+#kwamiStrip {
+    padding: 10px;
+    gap: 8px;
+}
+
+#kwamiStrip img {
+    width: 48px;
+    height: 48px;
+}
+
+/* Mobile layout */
+
+@media (max-width: 700px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+}

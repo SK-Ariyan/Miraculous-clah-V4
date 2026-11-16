@@ -1,0 +1,590 @@
+/* ==========================================
+   MIRACULOUS CLASH - KWAMI DRAFT SCREEN
+========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(ellipse at 50% 0%, #263d60 0%, transparent 55%),
+        linear-gradient(135deg, #080f20, #111d32, #080f20);
+    color: white;
+}
+
+/* ==========================================
+   MAIN BACKGROUND
+========================================== */
+
+.background {
+    width: 96%;
+    max-width: 1800px;
+    margin: auto;
+    padding: 15px;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.header h1 {
+    font-size: 38px;
+    letter-spacing: 3px;
+    color: #ffd45c;
+    text-shadow: 0 0 15px rgba(255, 200, 50, .6);
+}
+
+#turnText {
+    margin-top: 10px;
+    font-size: 27px;
+    font-weight: bold;
+    transition: .3s;
+}
+
+#pickInfo {
+    margin-top: 6px;
+    font-size: 16px;
+    color: #aebdd3;
+}
+
+/* ==========================================
+   PLAYER AREA
+========================================== */
+
+.players {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 25px;
+    margin: 20px 0;
+}
+
+.playerBox {
+    width: 42%;
+    text-align: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, .035);
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 16px;
+}
+
+.playerBox h2 {
+    padding: 8px;
+    font-size: 23px;
+    border-radius: 10px;
+    transition: .3s;
+}
+
+/* Active player */
+
+.active {
+    color: #ffe082;
+    text-shadow:
+        0 0 8px gold,
+        0 0 20px rgba(255, 215, 0, .6);
+    animation: glow 1.2s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 5px gold;
+    }
+
+    to {
+        text-shadow:
+            0 0 12px gold,
+            0 0 25px orange;
+    }
+}
+
+/* Player statistics */
+
+.playerStats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 5px;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+/* ==========================================
+   SELECTED KWAMI SLOTS
+========================================== */
+
+.selectedArea {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.slot {
+    width: 75px;
+    height: 75px;
+    border: 2px dashed rgba(255, 255, 255, .7);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transition: .25s;
+}
+
+.slot:hover {
+    border-color: #ffd45c;
+    box-shadow: 0 0 12px rgba(255, 212, 92, .3);
+}
+
+.slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ==========================================
+   BANNED KWAMI AREA
+========================================== */
+
+.bannedArea {
+    margin-top: 12px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    text-align: center;
+}
+
+.bannedArea h3 {
+    color: #ff7777;
+    font-size: 13px;
+    letter-spacing: 1px;
+    margin-bottom: 7px;
+}
+
+.banSlot {
+    min-height: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Individual banned Kwami */
+
+.bannedKwami {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    background: rgba(255, 50, 70, .08);
+    border: 1px solid rgba(255, 80, 90, .5);
+    border-radius: 9px;
+    transition: .2s;
+}
+
+.bannedKwami img {
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.bannedKwami span {
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.bannedKwami strong {
+    color: #ff6868;
+    font-size: 10px;
+}
+
+/* ==========================================
+   VS SECTION
+========================================== */
+
+.versus {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+}
+
+.versus h1 {
+    font-size: 48px;
+    color: #ff555f;
+    text-shadow: 0 0 18px rgba(255, 50, 70, .5);
+}
+
+/* ==========================================
+   DIVIDER
+========================================== */
+
+hr {
+    margin: 15px 0;
+    border: none;
+    height: 1px;
+    background: linear-gradient(
+        to right,
+        transparent,
+        #526b8a,
+        transparent
+    );
+}
+
+/* ==========================================
+   KWAMI CARD GRID
+========================================== */
+
+#cardContainer {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 13px;
+    height: auto;
+    overflow: visible;
+    padding: 10px 0 25px;
+}
+
+/* Individual Kwami card */
+
+.card {
+    position: relative;
+    min-width: 0;
+    padding: 9px;
+    background: linear-gradient(145deg, #1e3049, #111e32);
+    border: 1px solid rgba(130, 170, 220, .18);
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: .25s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .3);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: #ffd45c;
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, .4),
+        0 0 12px rgba(255, 212, 92, .2);
+}
+
+/* Kwami image */
+
+.card img {
+    width: 100%;
+    height: 115px;
+    object-fit: contain;
+    border-radius: 9px;
+    margin-bottom: 5px;
+}
+
+/* Kwami name */
+
+.card h3 {
+    text-align: center;
+    font-size: 18px;
+    color: #ffd45c;
+    margin: 3px 0;
+}
+
+/* Hide card statistics */
+
+.card .stats {
+    display: none;
+}
+
+/* ==========================================
+   SELECTED CARD
+========================================== */
+
+.card.selected {
+    opacity: .4;
+    pointer-events: none;
+    border: 2px solid #ff5555;
+}
+
+.card.selected::after {
+    content: "SELECTED";
+    position: absolute;
+    top: 12px;
+    right: -27px;
+    background: #e53945;
+    padding: 5px 30px;
+    transform: rotate(45deg);
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* ==========================================
+   BANNED CARD
+========================================== */
+
+.card.banned {
+    opacity: .45;
+    pointer-events: none;
+    position: relative;
+    filter: grayscale(.5);
+}
+
+.card.banned::after {
+    content: "✕";
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+    font-size: 85px;
+    font-weight: bold;
+    color: #ff4055;
+    text-shadow: 0 0 15px rgba(255, 0, 0, .5);
+}
+
+/* ==========================================
+   BACK BUTTON
+========================================== */
+
+#backBtn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 100;
+    padding: 10px 18px;
+    border: 1px solid rgba(255, 255, 255, .2);
+    border-radius: 9px;
+    background: #1d3049;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+#backBtn:hover {
+    background: #304d70;
+    border-color: #ffd45c;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+========================================== */
+
+@media (max-width: 1200px) {
+    #cardContainer {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .players {
+        gap: 10px;
+    }
+
+    .playerBox {
+        width: 45%;
+    }
+
+    #cardContainer {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .versus h1 {
+        font-size: 35px;
+    }
+}
+
+@media (max-width: 600px) {
+    .players {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .playerBox {
+        width: 100%;
+    }
+
+    .versus {
+        min-height: 45px;
+    }
+
+    #cardContainer {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .header h1 {
+        font-size: 27px;
+    }
+
+    #turnText {
+        font-size: 20px;
+    }
+}
+
+/* ==========================================
+   MIRACULOUS CLASH - PURPLE MYSTIC THEME
+========================================== */
+
+body {
+    background:
+        radial-gradient(ellipse at 50% 0%, #512080 0%, transparent 55%),
+        linear-gradient(135deg, #10091f, #1b1030, #0c1025);
+    color: #f5eaff;
+}
+
+.header h1 {
+    color: #e5baff;
+    text-shadow: 0 0 15px #a855f7, 0 0 30px #7e22ce;
+}
+
+#turnText {
+    color: #e9c6ff;
+    text-shadow: 0 0 12px rgba(168, 85, 247, .5);
+}
+
+#pickInfo {
+    color: #c4a6df;
+}
+
+.playerBox {
+    background: rgba(91, 33, 130, .13);
+    border: 1px solid rgba(192, 132, 252, .25);
+    box-shadow: 0 0 18px rgba(126, 34, 206, .12);
+}
+
+.playerBox h2 {
+    color: #e9d5ff;
+}
+
+.active {
+    color: #f0abfc;
+    text-shadow: 0 0 10px #d946ef, 0 0 25px #a855f7;
+}
+
+@keyframes glow {
+    from {
+        text-shadow: 0 0 6px #c084fc;
+    }
+    to {
+        text-shadow: 0 0 15px #e879f9, 0 0 30px #9333ea;
+    }
+}
+
+.slot {
+    background: rgba(168, 85, 247, .08);
+    border-color: rgba(216, 180, 254, .55);
+}
+
+.slot:hover {
+    border-color: #e879f9;
+    box-shadow: 0 0 15px #a855f7;
+}
+
+.bannedArea h3 {
+    color: #fb7185;
+}
+
+.bannedKwami {
+    background: rgba(190, 24, 93, .12);
+    border-color: rgba(251, 113, 133, .5);
+}
+
+.bannedKwami strong {
+    color: #fb7185;
+}
+
+.versus h1 {
+    color: #e879f9;
+    text-shadow: 0 0 18px #c026d3;
+}
+
+hr {
+    background: linear-gradient(
+        to right,
+        transparent,
+        #a855f7,
+        #e879f9,
+        transparent
+    );
+}
+
+.card {
+    background: linear-gradient(145deg, #302047, #1b1230);
+    border-color: rgba(192, 132, 252, .2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .35);
+}
+
+.card:hover {
+    border-color: #d8b4fe;
+    box-shadow: 0 0 20px rgba(168, 85, 247, .45);
+}
+
+.card h3 {
+    color: #e9c6ff;
+}
+
+.card.selected {
+    border-color: #f472b6;
+}
+
+.card.selected::after {
+    background: #c026d3;
+}
+
+.card.banned::after {
+    color: #fb7185;
+    text-shadow: 0 0 15px #e11d48;
+}
+
+#backBtn {
+    background: linear-gradient(135deg, #542477, #32164d);
+    border-color: #a855f7;
+    color: white;
+}
+
+#backBtn:hover {
+    background: linear-gradient(135deg, #7935a8, #542477);
+    border-color: #e879f9;
+    box-shadow: 0 0 15px rgba(192, 132, 252, .5);
+}
+
+/* ==========================================
+   SELECTED KWAMI SPOTLIGHT
+========================================== */
+
+/* Normal empty slots */
+.slot {
+    background: rgba(100, 50, 160, 0.12);
+    border: 2px dashed rgba(192, 132, 252, 0.4);
+    transition: all 0.3s ease;
+}
+
+/* Slots containing selected Kwamis */
+.slot:has(img) {
+    background: #160d27;
+    border: 2px solid #d8a4ff;
+
+    box-shadow:
+        0 0 10px #a855f7,
+        0 0 22px rgba(168, 85, 247, 0.65),
+        inset 0 0 12px rgba(192, 132, 252, 0.25);
+
+    transform: scale(1.05);
+}
+
+/* Selected Kwami image */
+.slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+}

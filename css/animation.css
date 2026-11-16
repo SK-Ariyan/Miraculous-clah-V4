@@ -1,0 +1,56 @@
+.heroContainer{
+
+    transition:
+        transform .22s ease;
+
+}
+
+.playerAttack{
+
+    transform:translateX(90px);
+
+}
+
+.enemyAttack{
+
+    transform:translateX(-90px);
+
+}
+
+.heroHurt{
+
+    animation:
+
+    hurtFlash
+
+    .3s;
+
+}
+
+@keyframes hurtFlash{
+
+0%{
+
+filter:none;
+
+}
+
+50%{
+
+filter:
+
+brightness(2)
+
+sepia(1)
+
+hue-rotate(-40deg);
+
+}
+
+100%{
+
+filter:none;
+
+}
+
+}

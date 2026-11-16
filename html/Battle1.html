@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/Battle1.css">
+</head>
+<body>
+    <div id="battle-screen">
+
+    <section id="enemy-panel"></section>
+
+    <section id="battlefield">
+
+    <img id="battleBackground">
+
+    <img id="battlePlatform">
+
+    <div id="effectLayer"></div>
+
+    <div id="playerAnchor">
+
+        <div class="heroContainer">
+
+            <img id="playerHero">
+
+        </div>
+
+    </div>
+
+    <div id="enemyAnchor">
+
+        <div class="heroContainer">
+
+            <img id="enemyHero">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+    <section id="player-panel"></section>
+
+    <section id="kwami-bar"></section>
+
+    <section id="battle-controls"></section>
+
+    <section id="battle-log"></section>
+
+</div>
+
+<div id="victoryScreen">
+
+    <h1 id="winnerText"></h1>
+
+    <button id="continueBtn">
+        Return to Lobby
+    </button>
+
+</div>
+<audio id="battleMusic" loop></audio>
+<audio id="victoryMusic">
+    <source src="../sounds/Victory.mp3" type="audio/mpeg">
+</audio>
+
+
+</script>
+<script src="../js/core/transition.js"></script>
+
+<!-- Data -->
+<script src="../js/data/heroes.js"></script>
+<script src="../js/data/kwamis_data.js"></script>
+
+<!-- AI Core -->
+<script src="../js/ai/personalities.js"></script>
+<script src="../js/ai/AImemory.js"></script>
+<script src="../js/ai/combo_planner.js"></script>
+<script src="../js/ai/game_state.js"></script>
+<script src="../js/ai/ability_scores.js"></script>
+<script src="../js/ai/hero_brains.js"></script>
+<script src="../js/ai/battle_evaluator.js"></script>
+<script src="../js/ai/kill_detector.js"></script>
+<script src="../js/ai/threat_detector.js"></script>
+<script src="../js/ai/move_scorer.js"></script>
+<script src="../js/ai/combo_analyzer.js"></script>
+<script src="../js/ai/battle_AI.js"></script>
+
+<!-- Battle -->
+  <script src="../js/battle/effects.js"></script>
+
+ <script src="../js/battle/heroManager.js"></script>
+
+<script src="../js/battle/animationManager.js"></script>
+
+<script src="../js/battle/battleRenderer.js"></script>
+
+ <script src="../js/battle/effects.js"></script>
+<script src="../js/battle/Battle1.js"></script>
+</body>
+</html>

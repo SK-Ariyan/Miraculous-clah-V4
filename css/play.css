@@ -1,0 +1,315 @@
+/* =====================================
+   MIRACULOUS CLASH - PLAY PAGE
+===================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #ffffff;
+
+    background:
+        radial-gradient(circle at 50% 35%, #32145c 0%, transparent 55%),
+        linear-gradient(135deg, #090613, #160b29, #080510);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow-x: hidden;
+}
+
+/* Background glow */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    background:
+        radial-gradient(circle at 15% 20%, #8b35ff18, transparent 30%),
+        radial-gradient(circle at 85% 80%, #ff36c518, transparent 30%);
+
+    pointer-events: none;
+}
+
+/* =====================================
+   BACK BUTTON
+===================================== */
+
+#backBtn {
+    position: fixed;
+    top: 25px;
+    left: 25px;
+    z-index: 10;
+
+    padding: 10px 20px;
+
+    background: #1b1030;
+    color: #e8d9ff;
+
+    border: 1px solid #8e42ff;
+    border-radius: 10px;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+#backBtn:hover {
+    background: #792cff;
+    color: white;
+
+    box-shadow: 0 0 18px #963fff99;
+    transform: translateY(-2px);
+}
+
+/* =====================================
+   MAIN CONTAINER
+===================================== */
+
+.playContainer {
+    width: 90%;
+    max-width: 1050px;
+
+    padding: 35px 30px;
+
+    text-align: center;
+
+    background: linear-gradient(
+        145deg,
+        #1b1030dd,
+        #10091ddd
+    );
+
+    border: 1px solid #7135b5;
+    border-radius: 22px;
+
+    box-shadow:
+        0 0 35px #7c2cff25,
+        inset 0 0 25px #8b35ff0a;
+
+    position: relative;
+    z-index: 1;
+}
+
+/* =====================================
+   PAGE TITLE
+===================================== */
+
+.pageTitle {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 3px;
+
+    margin-bottom: 40px;
+
+    color: #ffffff;
+
+    text-shadow:
+        0 0 10px #a64dff,
+        0 0 25px #792cff;
+}
+
+/* =====================================
+   GAME MODE CARDS
+===================================== */
+
+.modeContainer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.modeCard {
+    min-height: 260px;
+
+    padding: 30px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(
+        160deg,
+        #291642,
+        #160d27
+    );
+
+    border: 1px solid #6534a0;
+    border-radius: 18px;
+
+    position: relative;
+    overflow: hidden;
+
+    transition: 0.3s ease;
+}
+
+/* Card top glow */
+
+.modeCard::before {
+    content: "";
+    position: absolute;
+
+    top: 0;
+    left: 15%;
+    width: 70%;
+    height: 2px;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #c084ff,
+        transparent
+    );
+
+    box-shadow: 0 0 15px #a64dff;
+}
+
+/* Card hover */
+
+.modeCard:hover {
+    transform: translateY(-8px);
+
+    border-color: #c084ff;
+
+    box-shadow:
+        0 0 25px #8b35ff55,
+        inset 0 0 20px #8b35ff15;
+}
+
+/* =====================================
+   CARD TEXT
+===================================== */
+
+.modeCard h2 {
+    font-size: 22px;
+    font-weight: 800;
+
+    margin-bottom: 18px;
+
+    color: #e7caff;
+
+    text-shadow: 0 0 10px #9b4dff66;
+}
+
+.modeCard p {
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #c5b5d8;
+
+    min-height: 65px;
+    margin-bottom: 22px;
+}
+
+/* =====================================
+   PLAY BUTTONS
+===================================== */
+
+.modeCard button {
+    min-width: 145px;
+
+    padding: 12px 25px;
+
+    border: 1px solid #c084ff;
+    border-radius: 10px;
+
+    background: linear-gradient(
+        135deg,
+        #8738e8,
+        #5420a5
+    );
+
+    color: white;
+
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+
+    box-shadow: 0 0 15px #8738e855;
+
+    transition: 0.25s;
+}
+
+.modeCard button:hover {
+    background: linear-gradient(
+        135deg,
+        #b45aff,
+        #792cff
+    );
+
+    box-shadow:
+        0 0 15px #a64dff,
+        0 0 30px #792cff88;
+
+    transform: scale(1.06);
+}
+
+/* =====================================
+   MULTIPLAYER - COMING SOON
+===================================== */
+
+#multiplayerBtn button {
+    background: #292034;
+    color: #a99bb9;
+
+    border: 1px solid #655575;
+
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+#multiplayerBtn:hover {
+    transform: none;
+    border-color: #655575;
+    box-shadow: none;
+}
+
+#multiplayerBtn button:hover {
+    transform: none;
+    background: #292034;
+    box-shadow: none;
+}
+
+/* =====================================
+   RESPONSIVE DESIGN
+===================================== */
+
+@media (max-width: 750px) {
+
+    .playContainer {
+        width: 92%;
+        padding: 25px 18px;
+    }
+
+    .pageTitle {
+        font-size: 25px;
+        margin-bottom: 28px;
+    }
+
+    .modeContainer {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .modeCard {
+        min-height: 210px;
+        padding: 25px 18px;
+    }
+
+    #backBtn {
+        top: 12px;
+        left: 12px;
+    }
+}

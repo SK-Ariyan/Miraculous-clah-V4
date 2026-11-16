@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Battle</title>
+    <link rel="stylesheet" href="../css/battle.css">
+    <link rel="stylesheet" href="../css/transition.css">
+</head>
+<body>
+    <div id="fadeScreen"></div>
+    <button id="backBtn">⬅ Back</button>
+<div id="gameContainer">
+
+    <div id="topBar">
+
+        <h1 id="turnDisplay">PLAYER 1 TURN</h1>
+
+    </div>
+
+    <div id="battleArea">
+
+    <!-- PLAYER 1 -->
+    <div class="player-panel">
+
+        <div class="cornerPanel">
+
+            <div class="kwamis" id="player1Kwamis"></div>
+
+            <h2 id="player1Name">PLAYER 1</h2>
+
+            <div class="healthContainer">
+
+                <div class="healthBar">
+
+                    <div id="player1HealthFill" class="healthFill"></div>
+
+                </div>
+
+                <div id="player1HP" class="healthText"></div>
+
+            </div>
+
+            <div id="player1Shield" class="shield"></div>
+            <div id="player1Status" class="statusEffects"></div>
+
+        </div>
+
+        
+
+    </div>
+
+    <!-- CENTER -->
+
+    <div id="middleArea">
+
+        <div id="battlefield">
+
+    <div class="heroAnchor" id="playerAnchor">
+
+        <div id="player1Effects"></div>
+
+        <img id="player1Sprite">
+
+    </div>
+
+    <div class="vsText">VS</div>
+
+    <div class="heroAnchor" id="enemyAnchor">
+
+        <div id="player2Effects"></div>
+
+        <img id="player2Sprite">
+
+    </div>
+
+</div>
+
+    </div>
+
+    <!-- PLAYER 2 -->
+
+    <div class="player-panel">
+
+        <div class="cornerPanel">
+
+            <div class="kwamis" id="player2Kwamis"></div>
+
+            <h2 id="player2Name">PLAYER 2</h2>
+
+            <div class="healthContainer">
+
+                <div class="healthBar">
+
+                    <div id="player2HealthFill" class="healthFill"></div>
+
+                </div>
+
+                <div id="player2HP" class="healthText"></div>
+
+            </div>
+
+            <div id="player2Shield" class="shield"></div>
+
+<div id="player2Status" class="statusEffects"></div>
+
+        </div>
+
+        
+
+    </div>
+
+</div>
+
+    
+
+    <!-- BOTTOM PANEL -->
+    <div id="bottomPanel">
+
+        <!-- Battle Log ABOVE buttons -->
+        <div id="battleLog">
+
+            <h2>Battle Log</h2>
+
+            <div id="log">
+                Battle Started!
+            </div>
+
+        </div>
+
+        <!-- Attack Buttons -->
+        <div id="controlsArea">
+
+            <div id="abilityGrid">
+
+                <button id="normalAttack" class="battleMove">
+                    ⚔ Normal Attack
+                </button>
+
+                <div id="abilityPanel"></div>
+
+            </div>
+
+        </div>
+
+    </div> <!-- End bottomPanel -->
+
+</div> <!-- End gameContainer -->
+
+
+<!-- VICTORY SCREEN -->
+<div id="victoryScreen">
+
+    <h1 id="winnerText"></h1>
+
+    <button id="continueBtn">
+        Return to Lobby
+    </button>
+
+</div>
+
+<audio id="battleMusic" loop></audio>
+<audio id="victoryMusic">
+    <source src="../sounds/Victory.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    document.getElementById("backBtn").addEventListener("click",()=>{
+
+    battleMusic.pause();
+    battleMusic.currentTime = 0;
+
+    goTo("lobby.html");
+
+});
+</script>
+<script src="../js/core/transition.js"></script>
+
+<!-- Data -->
+<script src="../js/data/heroes.js"></script>
+<script src="../js/data/battleHeroes.js"></script>
+<script src="../js/data/kwamis_data.js"></script>
+
+<!-- AI Core -->
+ <script src="../js/battle/effects.js"></script>
+<script src="../js/ai/personalities.js"></script>
+<script src="../js/ai/AImemory.js"></script>
+<script src="../js/ai/combo_planner.js"></script>
+<script src="../js/ai/game_state.js"></script>
+<script src="../js/ai/ability_scores.js"></script>
+<script src="../js/ai/hero_brains.js"></script>
+<script src="../js/ai/battle_evaluator.js"></script>
+<script src="../js/ai/kill_detector.js"></script>
+<script src="../js/ai/threat_detector.js"></script>
+<script src="../js/ai/move_scorer.js"></script>
+<script src="../js/ai/combo_analyzer.js"></script>
+<script src="../js/ai/battle_AI.js"></script>
+
+<!-- Battle -->
+
+
+<script src="/js/battle/battle.js"></script>
+</body>
+
+</html>
