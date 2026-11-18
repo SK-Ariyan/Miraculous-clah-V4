@@ -36,6 +36,7 @@ function createKwamiStrip(){
         img.title = kwami.name;
 
         img.className = "stripIcon";
+img.dataset.kwami = kwami.name.toLowerCase();
         img.id = "strip-" + index;
         img.onclick = ()=>{
 
@@ -54,6 +55,9 @@ function createKwamiStrip(){
 function updateKwami(index){
 
     const kwami = kwamis[index];
+    const mainImage = document.getElementById("kwamiImage");
+
+mainImage.dataset.kwami = kwami.name.toLowerCase();
 
    const favorites =
 JSON.parse(localStorage.getItem("favoriteKwamis")) || [];

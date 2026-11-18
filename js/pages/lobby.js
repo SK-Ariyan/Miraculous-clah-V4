@@ -11,7 +11,7 @@ localStorage.getItem("playerName") || "Player";
 document.getElementById("playerName").textContent = playerName;
 
 const playerAvatar =
-    localStorage.getItem("playerAvatar") || "../hero/hero1.jpg";
+    localStorage.getItem("playerAvatar") || "../hero/Aiden.png";
 
 document.getElementById("playerName").textContent = playerName;
 document.getElementById("playerAvatar").src = playerAvatar;
@@ -30,8 +30,8 @@ document.getElementById("games").textContent = games;
 // ---------- Favourite Kwamis ----------
 // (Temporary)
 
-document.getElementById("fav1").src = "../photos/Tikki.jpg";
-document.getElementById("fav2").src = "../photos/plagg.jpg";
+document.getElementById("fav1").src = "../photos/Tikki.png";
+document.getElementById("fav2").src = "../photos/plagg.png";
 document.getElementById("fav3").src = "../photos/Wayz.png";
 
 
@@ -126,9 +126,8 @@ function loadFavoriteKwamis(){
         }
 
         else{
-
-            img.src = "../photos/question.png";
-            // or "" if you don't have a placeholder image
+            img.removeAttribute("src");
+            img.alt = "No favorite selected";
 
         }
 

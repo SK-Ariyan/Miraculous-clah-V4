@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0c081e">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../assets/icons/icon-192.png">
+    <title>Miraculous Clash - Multiplayer</title>
+
+    <link rel="stylesheet" href="../css/transition.css">
+    <link rel="stylesheet" href="../css/multiplayer.css">
+</head>
+
+<body>
+
+    <div id="fadeScreen"></div>
+
+    <button id="backBtn">⬅ Back</button>
+
+    <main class="multiplayerContainer">
+
+        <h1>🌐 MULTIPLAYER</h1>
+        <p>Battle against players online!</p>
+
+        <section id="roomActions">
+
+    <button id="createRoomBtn">CREATE ROOM</button>
+
+    <hr>
+
+    <input
+        type="text"
+        id="roomIdInput"
+        placeholder="Enter Room ID"
+        maxlength="10"
+    >
+
+    <button id="joinRoomBtn">JOIN ROOM</button>
+
+</section>
+
+        <section id="roomSection" style="display:none;">
+
+            <div class="roomIdContainer">
+    <h2 id="roomIdDisplay"></h2>
+    <button id="copyRoomBtn">📋 COPY</button>
+</div>
+
+            <div id="playersList"></div>
+
+            <p id="roomStatus">Waiting for players...</p>
+
+            <button id="readyBtn">READY</button>
+
+            <button id="cancelRoomBtn">CANCEL</button>
+
+            <button id="startBtn" style="display:none;">
+                START MATCH
+            </button>
+
+        </section>
+
+    </main>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="../js/core/transition.js"></script>
+    <script src="../js/pages/multiplayer.js"></script>
+<script src="../js/core/mobile.js"></script>
+
+</body>
+</html>

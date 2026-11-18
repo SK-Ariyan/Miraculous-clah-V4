@@ -45,10 +45,10 @@ const battleScene=new BattleScene();
 
 battleScene.start();
 
+battleRenderer.playerContainer =
+    document.querySelector("#playerAnchor .heroContainer");
 
-setTimeout(()=>{
-
-    playPlayer(type){
+function playPlayer(type){
 
     if(type=="attack"){
 
@@ -69,6 +69,10 @@ setTimeout(()=>{
     }
 
 }
+
+setTimeout(()=>{
+
+    playPlayer("attack");
 
 },1500);
 

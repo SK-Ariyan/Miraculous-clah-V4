@@ -12,7 +12,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: url('../images/lobbyBG.png') center/cover no-repeat fixed;
+    background: url('../photos/lobbyBG.png') center/cover no-repeat fixed;
     overflow: hidden;
     position: relative;
 }
@@ -27,7 +27,7 @@ body::before{
 
     inset:0;
 
-    background:url("../images/lobbyBG.png") center/cover no-repeat;
+    background:url("../photos/lobbyBG.png") center/cover no-repeat;
 
     filter:blur(2px);
 

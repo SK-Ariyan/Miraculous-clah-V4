@@ -1,9 +1,127 @@
+// MULTIPLAYER CONNECTION
+const isMultiplayer = sessionStorage.getItem("mode") === "multiplayer";
+
+const battleSocket = isMultiplayer ? io() : null;
+
+let multiplayerActionCounter = 0;
+
+
+
+// MULTIPLAYER PLAYER INFORMATION
+let multiplayerRoomId = sessionStorage.getItem("multiplayerRoomId");
+let multiplayerPlayerToken = sessionStorage.getItem("multiplayerPlayerToken");
+let multiplayerSeat = sessionStorage.getItem("multiplayerSeat");
+
+let multiplayerPlayers = [];
+let player1Name = "Player 1";
+let player2Name = "Player 2";
+
+let playerName = localStorage.getItem("playerName") || "Player";
+
+if (isMultiplayer) {
+
+    if (!multiplayerRoomId || !multiplayerPlayerToken) {
+        alert("Multiplayer session not found. Please rejoin your room.");
+        window.location.href = "multiplayer.html";
+        throw new Error("Missing multiplayer session");
+    }
+
+    battleSocket.emit("rejoin-room", {
+        roomId: multiplayerRoomId,
+        playerToken: multiplayerPlayerToken
+    }, (response) => {
+
+        if (!response?.success) {
+            alert("Unable to reconnect to the battle room.");
+            window.location.href = "multiplayer.html";
+            return;
+        }
+
+        multiplayerSeat = response.seat;
+        multiplayerPlayers = response.players;
+
+        const p1 = multiplayerPlayers.find(p => p.seat === "p1");
+        const p2 = multiplayerPlayers.find(p => p.seat === "p2");
+
+        player1Name = p1?.username || "Player 1";
+        player2Name = p2?.username || "Player 2";
+
+        document.getElementById("player1Name").textContent = player1Name;
+        document.getElementById("player2Name").textContent = player2Name;
+
+        console.log("Battle players:", player1Name, player2Name);
+    });
+}
+
 const player1Team = JSON.parse(localStorage.getItem("player1")) || [];
 const player2Team = JSON.parse(localStorage.getItem("player2")) || [];
 
 // Give every selected kwami a current cooldown
 player1Team.forEach(kwami => kwami.cooldown = 0);
 player2Team.forEach(kwami => kwami.cooldown = 0);
+
+if (isMultiplayer) {
+    battleSocket.on("battle-state", state => {
+        if (!state || !state.players) return;
+
+        const p1 = state.players.p1;
+        const p2 = state.players.p2;
+
+        player1HP = p1.hp;
+        player1MaxHP = p1.maxHp;
+        player1Shield = p1.shield;
+        player2HP = p2.hp;
+        player2MaxHP = p2.maxHp;
+        player2Shield = p2.shield;
+        currentTurn = state.currentTurn === "p1" ? 1 : 2;
+
+        p1.team.forEach(serverKwami => {
+            const localKwami = player1Team.find(item => item.name === serverKwami.name);
+            if (localKwami) localKwami.cooldown = serverKwami.cooldown;
+        });
+        p2.team.forEach(serverKwami => {
+            const localKwami = player2Team.find(item => item.name === serverKwami.name);
+            if (localKwami) localKwami.cooldown = serverKwami.cooldown;
+        });
+
+        player1Stunned = p1.stunned;
+        player1Frozen = p1.frozen;
+        player1Dodge = p1.dodge;
+        player1Immune = p1.immune;
+        player1DamageBuff = p1.damageBuff;
+        player1DamageReduction = p1.damageReduction;
+        player1RegenTurns = p1.regenTurns;
+        player1PassiveDisabled = p1.passiveDisabled;
+        player1AbilityBoost = p1.abilityBoost;
+
+        player2Stunned = p2.stunned;
+        player2Frozen = p2.frozen;
+        player2Dodge = p2.dodge;
+        player2Immune = p2.immune;
+        player2DamageBuff = p2.damageBuff;
+        player2DamageReduction = p2.damageReduction;
+        player2RegenTurns = p2.regenTurns;
+        player2PassiveDisabled = p2.passiveDisabled;
+        player2AbilityBoost = p2.abilityBoost;
+
+        actionLocked = false;
+        updateHealthBars();
+        updateStatusEffects();
+        updateTurn();
+        createAbilityButtons();
+
+        if (state.log && state.log.length) {
+            addLog(state.log[state.log.length - 1]);
+        }
+
+        if (state.status === "finished" && state.winnerSeat) {
+            checkWinConditions();
+            winnerText.textContent = `🏆 ${state.winnerName.toUpperCase()} WINS!`;
+            victoryScreen.style.display = "flex";
+            setTimeout(() => victoryScreen.classList.add("show"), 20);
+        }
+    });
+}
 
 const p1Div = document.getElementById("player1Kwamis");
 const p2Div = document.getElementById("player2Kwamis");
@@ -45,14 +163,17 @@ const player2Hero = battleHeroes[player2Index];
 console.log("Player Hero:", player1Hero.name);
 console.log("Opponent Hero:", player2Hero.name);
 
-const playerName =
-    localStorage.getItem("playerName") || "Player";
+if (!isMultiplayer) {
 
-document.getElementById("player1Name").textContent =
-    playerName;
+    const playerName =
+        localStorage.getItem("playerName") || "Player";
 
-document.getElementById("player2Name").textContent =
-    player2Hero.name;
+    document.getElementById("player1Name").textContent =
+        playerName;
+
+    document.getElementById("player2Name").textContent =
+        player2Hero.name;
+}
 
 // Load hero sprites
 const player1Sprite =
@@ -205,13 +326,7 @@ let startMessage = "";
 
 
 
-player1Team.forEach(kwami => {
 
-    player1HP += kwami.hp;
-    player1Damage += kwami.damage;
-    player1Speed += kwami.speed;
-
-});
 
 if(
     player1Team.some(k => k.name == "Longg") &&
@@ -220,13 +335,6 @@ if(
     player1DragonRider = true;
 }
 
-player2Team.forEach(kwami => {
-
-    player2HP += kwami.hp;
-    player2Damage += kwami.damage;
-    player2Speed += kwami.speed;
-
-});
 
 if(
     player2Team.some(k => k.name == "Longg") &&
@@ -344,6 +452,41 @@ const battleTracks = [
     "../sounds/Miraculous-Battle-theme.wav",
     "../sounds/Miraculous-Battle-theme2.wav"
 ];
+
+
+if (isMultiplayer) {
+
+    battleSocket.on("opponent-surrendered", (data) => {
+
+        console.log("Opponent surrendered:", data);
+
+        // Disable battle controls
+        attackButton.disabled = true;
+        abilityPanel.style.pointerEvents = "none";
+
+        // Stop battle music
+        battleMusic.pause();
+        battleMusic.currentTime = 0;
+
+        // Play victory music
+        victoryMusic.currentTime = 0;
+        victoryMusic.play();
+
+        // Display winner
+        winnerText.textContent =
+            `🏆 ${data.winnerName.toUpperCase()} WINS!`;
+
+        // Show victory screen
+        victoryScreen.style.display = "flex";
+
+        setTimeout(() => {
+            victoryScreen.classList.add("show");
+        }, 20);
+
+    });
+
+}
+
 
 // Pick one randomly
 const randomTrack = battleTracks[Math.floor(Math.random() * battleTracks.length)];
@@ -513,15 +656,14 @@ if(
 // --- CORE GAME LOOP ---
 
 function updateTurn() {
-    // Time Loop: first turn gets an extra turn
 
     if (currentTurn == 1) {
-        turnDisplay.innerHTML = `${playerName}'s TURN`;
+        turnDisplay.innerHTML = `${player1Name}'s TURN`;
     } else {
-        turnDisplay.innerHTML = `${player2Hero.name}'s TURN`;
+        turnDisplay.innerHTML = `${player2Name}'s TURN`;
     }
+
     createAbilityButtons();
-    
 }
 
 
@@ -548,6 +690,15 @@ function getCurrentLuck(){
 
 
 document.addEventListener("keydown", function(e){
+
+    const aiOpponentTurn =
+        sessionStorage.getItem("mode") === "ai" && currentTurn != 1;
+
+    if(aiOpponentTurn || actionLocked || uiLocked){
+        if(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Enter"].includes(e.key))
+            e.preventDefault();
+        return;
+    }
 
     // LEFT
 if(e.key=="ArrowLeft"){
@@ -630,18 +781,12 @@ if(selectedIndex >= battleButtons.length)
 
 attackButton.addEventListener("click", () => {
 
-    if(currentTurn != 1)
+    if(sessionStorage.getItem("mode") === "ai" && currentTurn != 1)
         return;
 
     normalAttack();
 
 });
-
-
-
-
-
-attackButton.style.pointerEvents = "none";
 
 function normalAttack(){
 
@@ -653,6 +798,21 @@ if(actionLocked)
         return;
 
 actionLocked = true;
+
+    if (isMultiplayer) {
+        multiplayerActionCounter++;
+        battleSocket.emit("battle-action", {
+            roomId: multiplayerRoomId,
+            actionId: `${multiplayerSeat}-${Date.now()}-${multiplayerActionCounter}`,
+            type: "normal"
+        }, (response) => {
+            if (!response?.success) {
+                actionLocked = false;
+                addLog(response?.message || "The action was rejected.");
+            }
+        });
+        return;
+    }
 
 
     let dmg = (currentTurn == 1) ? player1Damage : player2Damage;
@@ -871,8 +1031,13 @@ else{
     `;
 
 }
-
-        button.style.pointerEvents = "none";
+        button.disabled = kwami.cooldown > 0;
+        button.setAttribute("aria-label", `${kwami.name}: ${kwami.active}`);
+        button.addEventListener("click", () => {
+            if (kwami.cooldown == 0 && !actionLocked) {
+                useAbility(kwami);
+            }
+        });
 
         abilityPanel.appendChild(button);
     });
@@ -1440,5 +1605,31 @@ if (mode == "ai" && currentTurn == 2) {
 
 }
 
+
+function leaveMultiplayerBattle() {
+
+    battleMusic.pause();
+    battleMusic.currentTime = 0;
+
+    battleSocket.emit("surrender-battle", {
+        roomId: multiplayerRoomId,
+        playerToken: multiplayerPlayerToken
+    }, (response) => {
+
+        // Clear old multiplayer session
+        sessionStorage.removeItem("multiplayerRoomId");
+        sessionStorage.removeItem("multiplayerPlayerToken");
+        sessionStorage.removeItem("multiplayerSeat");
+
+        sessionStorage.removeItem("player1HeroIndex");
+        sessionStorage.removeItem("player2HeroIndex");
+
+        sessionStorage.removeItem("mode");
+
+        goTo("lobby.html");
+
+    });
+
+}
 
 

@@ -1,0 +1,160 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: url("../assets/background/Bg.webp") center/cover fixed;
+    color: white;
+}
+
+.multiplayerContainer {
+    width: 90%;
+    max-width: 650px;
+    margin: 80px auto;
+    padding: 35px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.78);
+    border: 2px solid #e5b800;
+    border-radius: 20px;
+    box-shadow: 0 0 25px rgba(229, 184, 0, 0.35);
+}
+
+h1 {
+    color: #ffd700;
+    margin-bottom: 12px;
+}
+
+.multiplayerContainer > p {
+    margin-bottom: 30px;
+    color: #ddd;
+}
+
+input {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 15px 0;
+    border: 2px solid #d6ad00;
+    border-radius: 8px;
+    background: #171717;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+button {
+    padding: 13px 25px;
+    border: none;
+    border-radius: 8px;
+    background: #e5b800;
+    color: #171717;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #ffe45c;
+    transform: scale(1.04);
+}
+
+#backBtn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+hr {
+    margin: 25px 0;
+    border: 1px solid #555;
+}
+
+#roomSection {
+    margin-top: 30px;
+}
+
+#roomIdDisplay {
+    color: #ffd700;
+    margin-bottom: 20px;
+}
+
+
+#playersList {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 25px;
+    margin: 25px 0;
+    padding: 25px 15px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.playerCard {
+    flex: 1 1 200px;
+    max-width: 240px;
+    min-width: 180px;
+    padding: 20px 12px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #d6ad00;
+    border-radius: 12px;
+    text-align: center;
+    overflow: visible;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.playerCard img {
+    display: block;
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #ffd700;
+    margin: 0 auto 15px;
+}
+
+.playerCard span {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+.playerCard p {
+    margin-top: 8px;
+    text-align: center;
+}
+
+
+
+#roomStatus {
+    margin: 20px 0;
+    color: #ffe45c;
+}
+
+#startBtn {
+    margin-left: 10px;
+}
+
+@media (max-width: 600px) {
+    .multiplayerContainer {
+        padding: 22px;
+        margin-top: 90px;
+    }
+
+    #startBtn {
+        margin: 10px 0;
+    }
+}

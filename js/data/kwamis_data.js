@@ -8,8 +8,8 @@ voice:"../voices/tikki.mp3",
 accent:"#FFD54A",
 
 active:"Lucky Charm",
-effect:"Heal 50 HP and deal 35 damage.",
-passive:"Heal 2 HP every turn.",
+effect:"Heal 70 HP and deal 40 damage.",
+passive:"Trigger 4 HP regeneration for 3 turns.",
 
 hp:50,
 damage:5,
@@ -20,7 +20,7 @@ charge:6,
 synergy:{
 partner:"Plagg",
 name:"Creation & Destruction",
-effect:"Whenever Tikki or Plagg uses an ability, both recover 20 HP."
+    effect:"At the start of battle, gain 20 maximum HP and add 20 damage to your team's first attack."
 },
 
 
@@ -52,12 +52,12 @@ voice:"../voices/plagg.mp3",
 accent:"#7E57C2",
 
 active:"Cataclysm",
-effect:"Deal 80 damage and destroy the enemy shield.",
+effect:"Deal 120 damage and destroy the enemy shield.",
 passive:"Deal 10 True Damage every turn.",
 
 hp:10,
-damage:20,
-speed:8,
+damage:120,
+speed:10,
 luck:5,
 charge:3,
 
@@ -96,8 +96,8 @@ voice:"../voices/wayz.mp3",
 accent:"#43A047",
 
 active:"Shell-ter",
-effect:"Deal 30 damage, gain 70 Shield, +20 Damage Reduction and an Extra Turn.",
-passive:"Heal 5 HP every turn.",
+effect:"Deal 40 damage, gain 30 Shield, reduce incoming damage by 10, and gain an extra turn.",
+passive:"Trigger 5 HP regeneration for 2 turns.",
 
 hp:40,
 damage:8,
@@ -140,7 +140,7 @@ voice:"../voices/trics.mp3",
 accent:"#FF9800",
 
 active:"Mirage",
-effect:"Deal 40 damage, Heal 10 HP and gain an Extra Turn.",
+effect:"Deal 60 damage, heal 10 HP, and gain an extra turn.",
 passive:"None.",
 
 hp:30,
@@ -182,7 +182,7 @@ voice:"../voices/pollen.mp3",
 accent:"#FDD835",
 
 active:"Venom",
-effect:"Deal 35 damage and Stun the enemy.",
+effect:"Deal 55 damage and stun the enemy.",
 passive:"None.",
 
 hp:15,
@@ -218,11 +218,11 @@ ai:{
 name:"Roaar",
 type:"Exaltation",
 image:"../photos/Roaar.png",
-voice:"../voices/Roaar.mp3",
+voice:"../voices/roaar.mp3",
 accent:"#E53935",
 
 active:"Clout",
-effect:"Deal 50 damage and gain an Extra Turn.",
+effect:"Deal 100 damage and gain an extra turn.",
 passive:"None.",
 
 hp:10,
@@ -262,7 +262,7 @@ voice:"../voices/long.mp3",
 accent:"#1565C0",
 
 active:"Elemental Burst",
-effect:"Deal 45 damage, Heal 10 HP, Deal 10 True Damage and gain Double Attack.",
+effect:"Deal 80 damage, heal 20 HP, deal 10 true damage, and make your next attack hit twice.",
 passive:"None.",
 
 hp:30,
@@ -305,8 +305,8 @@ voice:"../voices/kalki.mp3",
 accent:"#00ACC1",
 
 active:"Voyage",
-effect:"Deal 40 damage, Break Shield and gain Dodge.",
-passive:"Dodge the next incoming attack.",
+effect:"Deal 60 damage, destroy the enemy shield, and dodge the next incoming attack.",
+passive:"None.",
 
 hp:30,
 damage:2,
@@ -317,7 +317,7 @@ charge:4,
 synergy:{
 partner:"Longg",
 name:"Dragon Rider",
-effect:"Longg and Kaalki both gain +20 Speed and their abilities recharge 1 turn faster."
+    effect:"Your team takes the first turn when both Longg and Kaalki are on the team."
 },
 
 preferred:null,
@@ -348,7 +348,7 @@ voice:"../voices/fluff.mp3",
 accent:"#F48FB1",
 
 active:"Burrow",
-effect:"Deal 30 damage and immediately restore every ally cooldown.",
+effect:"Deal 40 damage and reduce other allies' cooldowns by up to 10 turns.",
 passive:"None.",
 
 hp:20,
@@ -389,7 +389,7 @@ voice:"../voices/sass.mp3",
 accent:"#8E24AA",
 
 active:"Second Chance",
-effect:"Deal 30 damage, Undo Last Damage and Reset Ally Cooldowns.",
+effect:"Deal 30 damage, reduce allies' cooldowns by 1 turn, and gain an extra turn.",
 passive:"None.",
 
 hp:20,
@@ -430,8 +430,8 @@ voice:"../voices/daizzi.mp3",
 accent:"#F48FB1",
 
 active:"Jubilation",
-effect:"Heal 80 HP and keeps the move. ",
-passive:"Reduce incoming damage by 40.",
+effect:"Heal 50 HP and gain an extra turn.",
+passive:"None.",
 
 hp:60,
 damage:2,
@@ -471,7 +471,7 @@ voice:"../voices/mullo.mp3",
 accent:"#B0BEC5",
 
 active:"Multitude",
-effect:"Deal 30 damage and your next attack hits twice.",
+effect:"Deal 35 damage and make your next attack hit twice.",
 passive:"None.",
 
 hp:15,
@@ -512,14 +512,14 @@ voice:"../voices/nuroo.mp3",
 accent:"#7E57C2",
 
 active:"Akumatize",
-effect:"Deal 40 damage, gain +40 Damage and Regenerate 10 HP for 2 turns.",
+effect:"Deal 150 damage, gain +40 damage, and regenerate 10 HP for 2 turns.",
 passive:"None.",
 
 hp:35,
 damage:15,
 speed:9,
 luck:5,
-charge:4,
+charge:10,
 
 synergy:{
     partner:"Trics",
@@ -556,7 +556,7 @@ voice:"../voices/orikko.wav",
 accent:"#FFFFFF",
 
 active:"Sublimation",
-effect:"Randomly gain Healing, Damage Buff, Shield, Dodge or Cooldown Reduction.",
+effect:"Randomly heal 40 HP, gain +50 damage, gain 50 Shield, dodge the next attack, or receive no effect.",
 passive:"None.",
 
 hp:40,
@@ -598,7 +598,7 @@ voice:"../voices/stomp.mp3",
 accent:"#795548",
 
 active:"Resistance",
-effect:"Deal 30 damage, gain 30 Shield, Immunity and an Extra Turn.",
+effect:"Deal 40 damage, gain 10 Shield, become immune to the next attack, and gain an extra turn.",
 passive:"None.",
 
 hp:40,
@@ -640,8 +640,8 @@ voice:"../voices/tusso.mp3",
 accent:"#D81B60",
 
 active:"Senti Monster",
-effect:"Heal 10 HP and deal 60 damage.",
-passive:"Heal 10 HP every 2 turns.",
+effect:"Heal 10 HP and deal 80 damage.",
+passive:"Trigger 10 HP regeneration for 2 turns.",
 
 hp:30,
 damage:18,
@@ -681,7 +681,7 @@ voice:"../voices/xuppu.mp3",
 accent:"#FF7043",
 
 active:"Uproar",
-effect:"Deal 60 damage and Disable Enemy Passive.",
+effect:"Deal 100 damage and temporarily disable the enemy's passive.",
 passive:"None.",
 
 hp:10,
@@ -724,7 +724,7 @@ voice:"../voices/ziggy.mp3",
 accent:"#9CCC65",
 
 active:"Genesis",
-effect:"Boost the next Ability.",
+effect:"Increase the next damage or healing effect by 50%.",
 passive:"None.",
 
 hp:45,
@@ -766,7 +766,7 @@ voice:"../voices/bark.mp3",
 accent:"#8D6E63",
 
 active:"Fetch",
-effect:"Copy the first ability used by any other kwami. Bark permanently keeps that ability, its cooldown, and all of its effects for the rest of the match.",
+effect:"Copy and use the most recently used supported Kwami ability.",
 passive:"None.",
 
 hp:30,
@@ -805,6 +805,25 @@ ai:{
 
 function useAbility(kwami) {
 
+    if (typeof battleSocket !== "undefined" && battleSocket &&
+        sessionStorage.getItem("mode") === "multiplayer") {
+        if (actionLocked || kwami.cooldown > 0) return;
+        actionLocked = true;
+        multiplayerActionCounter++;
+        battleSocket.emit("battle-action", {
+            roomId: multiplayerRoomId,
+            actionId: `${multiplayerSeat}-${Date.now()}-${multiplayerActionCounter}`,
+            type: "ability",
+            kwamiName: kwami.name
+        }, (response) => {
+            if (!response?.success) {
+                actionLocked = false;
+                addLog(response?.message || "The ability was rejected.");
+            }
+        });
+        return;
+    }
+
     if(actionLocked)
     return;
 
@@ -826,8 +845,8 @@ actionLocked = true;
 
         case "Tikki":
             addLog("✨ Tikki used Lucky Charm!");
-            heal(50);
-            criticalAbility(kwami,35);
+            heal(70);
+            criticalAbility(kwami,40);
             
             break;
 
@@ -835,13 +854,13 @@ actionLocked = true;
             addLog("💥 Plagg used Cataclysm!");
             breakShield();
             updateStatusEffects();
-            criticalAbility(kwami,80);
+            criticalAbility(kwami,120);
             
             break;
 
         case "Wayz":
             addLog("🛡 Wayz used Shell-ter!");
-            criticalAbility(kwami,35);
+            criticalAbility(kwami,40);
             giveShield(30);
             updateStatusEffects();
             giveDamageReduction(10);
@@ -852,7 +871,7 @@ actionLocked = true;
 
         case "Trics":
             addLog("🦊 Trics used Mirage!");
-            criticalAbility(kwami,40);
+            criticalAbility(kwami,60);
             heal(10);
             extraTurn = true;
             
@@ -860,7 +879,7 @@ actionLocked = true;
 
         case "Pollen":
             addLog("🐝 Pollen used Venom!");
-            criticalAbility(kwami,30);
+            criticalAbility(kwami,55);
             stunEnemy();
             updateStatusEffects();
             
@@ -868,15 +887,15 @@ actionLocked = true;
 
         case "Roaar":
             addLog("🦁 Roaar used Clout!");
-            criticalAbility(kwami,50);
+            criticalAbility(kwami,100);
             extraTurn = true;
             
             break;
 
         case "Longg":
             addLog("🐉 Longg used Elemental Burst!");
-            criticalAbility(kwami,45);
-            heal(10);
+            criticalAbility(kwami,80);
+            heal(20);
             giveDoubleAttack();
             dealTrueDamage(10);
             updateStatusEffects();
@@ -886,7 +905,7 @@ actionLocked = true;
         case "Kaalki":
             addLog("🐎 Kaalki used Voyage!");
             giveDodge();
-            criticalAbility(kwami,40);
+            criticalAbility(kwami,60);
             breakShield();
             updateStatusEffects();
             addLog("🐎 Kaalki used Voyage!");
@@ -902,7 +921,7 @@ actionLocked = true;
 
         case "Sass":
             addLog("🐍 Sass used Second Chance!");
-            criticalAbility(kwami,20);
+            criticalAbility(kwami,30);
             reduceCooldowns(1);
             updateStatusEffects();
             extraTurn = true;
@@ -911,14 +930,14 @@ actionLocked = true;
 
         case "Daizzi":
             addLog("🐷 Daizzi used Jubilation!");
-            heal(40);
+            heal(50);
             extraTurn = true;
             
             break;
 
         case "Mullo":
             addLog("🐭 Mullo used Multitude!");
-            criticalAbility(kwami,25);
+            criticalAbility(kwami,35);
             giveDoubleAttack();
             updateStatusEffects();
             
@@ -926,7 +945,7 @@ actionLocked = true;
 
         case "Nuroo":
             addLog("🦋 Nuroo used Akumatize!");
-            criticalAbility(kwami,40);
+            criticalAbility(kwami,150);
             giveDamageBuff(40);
             giveRegeneration(10,2);
             updateStatusEffects();
@@ -973,14 +992,14 @@ actionLocked = true;
             updateStatusEffects();
             giveShield(10);
             extraTurn = true;
-            criticalAbility(kwami,30);
+            criticalAbility(kwami,40);
             
             break;
 
         case "Tussoo":
             addLog("🐖 Tussoo used Genesis Feast!");
             heal(10);
-            criticalAbility(kwami,60);
+            criticalAbility(kwami,80);
             
             break;
 
@@ -989,7 +1008,7 @@ actionLocked = true;
             
             disableEnemyPassive();
             updateStatusEffects();
-            criticalAbility(kwami,60);
+            criticalAbility(kwami,100);
             
             break;
 

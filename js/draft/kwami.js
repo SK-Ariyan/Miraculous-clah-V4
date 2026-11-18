@@ -3,6 +3,7 @@
 // ==========================
 
 const cardContainer = document.getElementById("cardContainer");
+const multiplayerMode = sessionStorage.getItem("mode") === "multiplayer";
 
 // ==========================
 // HTML ELEMENTS
@@ -54,11 +55,21 @@ kwamis.forEach((kwami,index)=>{
     const card = document.createElement("div");
 
     card.className = "card";
-    card.dataset.index = index;
+card.dataset.index = index;
+card.dataset.kwami = kwami.name.toLowerCase();
+
+// Individual Kwami theme
+let themeColor = kwami.accent;
+
+if (kwami.name === "Orikko") {
+    themeColor = "#90CAF9"; // Avoid a white card
+}
+
+card.style.setProperty("--kwami-color", themeColor);
+card.dataset.kwami = kwami.name.toLowerCase();
 
     card.innerHTML = `
         <img src="${kwami.image}">
-        <h3>${kwami.name}</h3>
     `;
 
     card.addEventListener("click",()=>{
@@ -80,7 +91,9 @@ kwamis.forEach((kwami,index)=>{
 
 let draftOrder;
 
-if(Math.random() < 0.5){
+if(multiplayerMode){
+    draftOrder = [];
+}else if(Math.random() < 0.5){
 
     draftOrder = [
         "p1",
@@ -114,6 +127,11 @@ let player2Team = [];
 
 let phase = "ban";
 let bannedKwamis = [];
+let multiplayerSocket = null;
+let multiplayerSeat = null;
+let multiplayerDraftState = null;
+let multiplayerActionPending = false;
+let multiplayerRedirectScheduled = false;
 
 // ==========================
 // UPDATE UI
@@ -217,11 +235,29 @@ function updateTurnUI(){
 
 }
 
+function isAITurn(){
+    if(sessionStorage.getItem("mode") !== "ai")
+        return false;
+
+    if(phase === "ban")
+        return turn === 1;
+
+    return draftOrder[turn] === "p2";
+}
+
 // ==========================
 // SELECT A KWAMI
 // ==========================
 
-function selectKwami(card,kwami){
+function selectKwami(card,kwami,aiAction = false){
+
+    if(multiplayerMode){
+        submitMultiplayerDraftAction(kwami);
+        return;
+    }
+
+    if(isAITurn() && !aiAction)
+        return;
 
     if(card.classList.contains("selected"))
         return;
@@ -360,7 +396,7 @@ function nextDraftTurn(){
 
         setTimeout(()=>{
 
-            selectKwami(aiCard, aiPick);
+            selectKwami(aiCard, aiPick, true);
 
         },700);
 
@@ -402,7 +438,7 @@ function nextBanTurn(){
 
         setTimeout(()=>{
 
-            selectKwami(aiCard, aiBan);
+            selectKwami(aiCard, aiBan, true);
 
         },700);
 
@@ -436,9 +472,8 @@ function updateBannedSlots(){
 
     p1BanSlot.innerHTML = "";
     p2BanSlot.innerHTML = "";
-
+    
     player1BannedKwamis.forEach(kwami=>{
-
         p1BanSlot.innerHTML += `
             <div class="bannedKwami">
                 <img src="${kwami.image}" alt="${kwami.name}">
@@ -446,11 +481,9 @@ function updateBannedSlots(){
                 <strong>BANNED</strong>
             </div>
         `;
-
     });
-
+    
     player2BannedKwamis.forEach(kwami=>{
-
         p2BanSlot.innerHTML += `
             <div class="bannedKwami">
                 <img src="${kwami.image}" alt="${kwami.name}">
@@ -458,16 +491,174 @@ function updateBannedSlots(){
                 <strong>BANNED</strong>
             </div>
         `;
+    });
+    
+    }
 
+function startMultiplayerDraft(){
+    const roomId = sessionStorage.getItem("multiplayerRoomId");
+    const playerToken = sessionStorage.getItem("multiplayerPlayerToken");
+
+    if(!roomId || !playerToken || typeof io !== "function"){
+        turnText.textContent = "Room connection information is missing. Return to the multiplayer lobby.";
+        cardContainer.querySelectorAll(".card").forEach(card => {
+            card.style.pointerEvents = "none";
+        });
+        return;
+    }
+
+    multiplayerSocket = io({ reconnection: true });
+
+    multiplayerSocket.on("connect", ()=>{
+        multiplayerActionPending = false;
+        turnText.textContent = "Reconnecting to the multiplayer draft...";
+        multiplayerSocket.emit("rejoin-room", { roomId, playerToken }, response => {
+            if(!response?.success){
+                turnText.textContent = response?.message || "Could not rejoin the draft room.";
+                return;
+            }
+
+            multiplayerSeat = response.seat;
+            sessionStorage.setItem("multiplayerSeat", multiplayerSeat);
+            if(response.draftState)
+                renderMultiplayerDraft(response.draftState);
+
+            console.log("MULTIPLAYER REJOIN:", {
+                seat: multiplayerSeat,
+                roomId,
+                draftState: response.draftState
+            });
+        });
     });
 
+    multiplayerSocket.on("draft-state", renderMultiplayerDraft);
+    multiplayerSocket.on("disconnect", ()=>{
+        multiplayerActionPending = false;
+        turnText.textContent = "Connection lost. Reconnecting to the draft...";
+        cardContainer.querySelectorAll(".card").forEach(card => {
+            card.style.pointerEvents = "none";
+        });
+    });
+    multiplayerSocket.on("connect_error", ()=>{
+        turnText.textContent = "Unable to connect. Retrying...";
+    });
 }
+
+function submitMultiplayerDraftAction(kwami){
+    const currentAction = multiplayerDraftState?.currentAction;
+    if(!multiplayerSocket?.connected || multiplayerActionPending ||
+        multiplayerDraftState?.status !== "drafting" ||
+        currentAction?.seat !== multiplayerSeat){
+        return;
+    }
+
+    multiplayerActionPending = true;
+    cardContainer.querySelectorAll(".card").forEach(card => {
+        card.style.pointerEvents = "none";
+    });
+
+    multiplayerSocket.emit("draft-action", {
+        roomId: sessionStorage.getItem("multiplayerRoomId"),
+        action: currentAction.action,
+        kwamiName: kwami.name,
+        turnIndex: multiplayerDraftState.turnIndex
+    }, response => {
+        multiplayerActionPending = false;
+        if(!response?.success){
+            turnText.textContent = response?.message || "That draft action was rejected.";
+            if(multiplayerDraftState)
+                renderMultiplayerDraft(multiplayerDraftState);
+        }else if(multiplayerDraftState){
+            renderMultiplayerDraft(multiplayerDraftState);
+        }
+    });
+}
+
+function renderMultiplayerDraft(state){
+    if(!state || !Array.isArray(state.teams?.p1) || !Array.isArray(state.teams?.p2))
+        return;
+
+    const previousState = multiplayerDraftState;
+    multiplayerDraftState = state;
+    player1Team = state.teams.p1.map(name => kwamis.find(kwami => kwami.name === name)).filter(Boolean);
+    player2Team = state.teams.p2.map(name => kwamis.find(kwami => kwami.name === name)).filter(Boolean);
+    player1BannedKwamis = state.banned.p1.map(name => kwamis.find(kwami => kwami.name === name)).filter(Boolean);
+    player2BannedKwamis = state.banned.p2.map(name => kwamis.find(kwami => kwami.name === name)).filter(Boolean);
+    bannedKwamis = [...state.banned.p1, ...state.banned.p2];
+
+    const playerNames = Object.fromEntries((state.players || []).map(player => [player.seat, player.username]));
+    player1Title.textContent = playerNames.p1 || "Player 1";
+    player2Title.textContent = playerNames.p2 || "Player 2";
+    player1Title.classList.toggle("active", state.currentAction?.seat === "p1");
+    player2Title.classList.toggle("active", state.currentAction?.seat === "p2");
+
+    const selectedNames = [...state.teams.p1, ...state.teams.p2];
+    const bannedNames = [...state.banned.p1, ...state.banned.p2];
+    const canAct = state.status === "drafting" &&
+        state.currentAction?.seat === multiplayerSeat &&
+        !multiplayerActionPending && multiplayerSocket?.connected;
+
+        console.log("DRAFT PERMISSION:", {
+    mySeat: multiplayerSeat,
+    expectedSeat: state.currentAction?.seat,
+    action: state.currentAction?.action,
+    status: state.status,
+    connected: multiplayerSocket?.connected,
+    pending: multiplayerActionPending,
+    canAct: canAct
+});
+    cardContainer.querySelectorAll(".card").forEach(card => {
+        const name = kwamis[Number(card.dataset.index)]?.name;
+        card.classList.toggle("selected", selectedNames.includes(name));
+        card.classList.toggle("banned", bannedNames.includes(name));
+        card.style.pointerEvents = canAct && !selectedNames.includes(name) && !bannedNames.includes(name)
+            ? ""
+            : "none";
+    });
+
+    updateSlots();
+    updateBannedSlots();
+    updatePreviewStats();
+
+    if(state.status === "complete"){
+        turnText.textContent = "Draft complete!";
+        pickInfo.textContent = "Both teams are ready for hero selection.";
+        localStorage.setItem("player1", JSON.stringify(player1Team));
+        localStorage.setItem("player2", JSON.stringify(player2Team));
+        localStorage.setItem("multiplayerDraft", JSON.stringify(state));
+        sessionStorage.setItem("multiplayerDraftComplete", "true");
+
+        if(!multiplayerRedirectScheduled){
+            multiplayerRedirectScheduled = true;
+            setTimeout(()=>goTo("./hero-selection.html"), 1800);
+        }
+    }else if(state.currentAction){
+        const activeName = playerNames[state.currentAction.seat] ||
+            (state.currentAction.seat === "p1" ? "Player 1" : "Player 2");
+        turnText.textContent = `${activeName} ${state.currentAction.action === "ban" ? "BANNING" : "SELECTING"}`;
+
+        if(state.currentAction.action === "ban"){
+            const banNumber = state.currentAction.seat === "p1" ? 1 : 2;
+            pickInfo.textContent = `Ban ${banNumber} of 2`;
+        }else{
+            pickInfo.textContent = `Pick ${state.turnIndex - 1} of 6`;
+        }
+    }
+
+    if(previousState && state.turnIndex === previousState.turnIndex + 1){
+        const completedAction = previousState.currentAction;
+        const sound = completedAction?.action === "ban" ? banSound : selectSound;
+        sound.currentTime = 0;
+        sound.play().catch(()=>{});
+    }
+}
+
 const personality = PersonalityManager.choose();
 
-
-
-
-
-updateTurnUI();
-updatePreviewStats();
+if(multiplayerMode){
+    startMultiplayerDraft();
+}else{
+    updateTurnUI();
+    updatePreviewStats();
+}
 

@@ -24,8 +24,11 @@ document.getElementById("vsAiBtn").onclick = ()=>{
 };
 
 // Multiplayer
+// Multiplayer
 document.getElementById("multiplayerBtn").onclick = ()=>{
 
-    alert("Coming Soon!");
+    sessionStorage.setItem("mode", "multiplayer");
+
+    goTo("multiplayer.html");
 
 };

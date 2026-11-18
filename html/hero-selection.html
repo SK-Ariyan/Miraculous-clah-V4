@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0c081e">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../assets/icons/icon-192.png">
 
     <title>Hero Selection | Miraculous Clash</title>
 
@@ -21,6 +24,15 @@
             background:
                 radial-gradient(circle at center, #302052, #10091f 75%);
         }
+
+        body {
+    background-image: url("../assets/background/HeroPage.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+}
 
         .container {
             width: 95%;
@@ -47,16 +59,17 @@
         }
 
         .selectedHeroes {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 20px;
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(200,150,255,0.3);
-            border-radius: 15px;
-        }
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    margin: 20px 0;
+    padding: 20px;
+    min-height: 260px;
+    background: rgba(20, 10, 40, 0.75);
+    border: 1px solid rgba(200,150,255,0.4);
+    border-radius: 18px;
+}
 
         .selectedBox {
             width: 40%;
@@ -68,10 +81,11 @@
         }
 
         .selectedBox img {
-            width: 100px;
-            height: 110px;
-            object-fit: contain;
-        }
+    width: 190px;
+    height: 175px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(190, 130, 255, 0.5));
+}
 
         .selectedBox p {
             color: #ccc;
@@ -90,38 +104,75 @@
             margin-top: 25px;
         }
 
-        .heroCard {
-            background: linear-gradient(145deg, #35234e, #191126);
-            border: 2px solid #594078;
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        /* HERO CARD DESIGN */
+/* HERO CARD DESIGN */
+.heroCard {
+    width: 100%;
+    min-height: 230px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
 
-        .heroCard:hover {
-            transform: translateY(-5px);
-            border-color: #d8a5ff;
-            box-shadow: 0 0 15px #9b5de5;
-        }
+    background:
+        radial-gradient(circle at 50% 25%, rgba(45, 110, 180, 0.25), transparent 65%),
+        linear-gradient(145deg, #172c48, #091321);
 
-        .heroCard img {
-            width: 100%;
-            height: 125px;
-            object-fit: contain;
-        }
+    border: 1px solid #557da8;
+    border-radius: 15px;
 
-        .heroCard h3 {
-            margin: 8px 0 4px;
-            color: #f0d5ff;
-        }
+    box-shadow: inset 0 0 15px rgba(80, 150, 220, 0.12);
+    transition: 0.3s ease;
+}
 
-        .role {
-            color: #ffc857;
-            font-size: 13px;
-        }
+/* CHARACTER IMAGE */
+.heroCard img {
+    width: 100%;
+    height: 165px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(120, 180, 255, 0.4));
+    transition: transform 0.3s ease;
+}
 
+/* HERO NAME */
+.heroCard h3 {
+    margin: 8px 0;
+    font-size: 19px;
+    letter-spacing: 1px;
+    color: #f5e5b5;
+    text-shadow: 0 0 8px rgba(255, 205, 100, 0.4);
+}
+
+/* ROLE BADGE */
+.role {
+    display: inline-block;
+    padding: 5px 14px;
+    margin-top: 3px;
+
+    color: #ffd76a;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    background: rgba(255, 215, 106, 0.10);
+    border: 1px solid rgba(255, 215, 106, 0.45);
+    border-radius: 20px;
+}
+
+/* HOVER EFFECT */
+.heroCard:hover {
+    transform: translateY(-6px);
+    border-color: #e6c477;
+
+    box-shadow:
+        0 0 18px rgba(100, 170, 230, 0.45),
+        inset 0 0 18px rgba(100, 170, 230, 0.15);
+}
+
+.heroCard:hover img {
+    transform: scale(1.08);
+}
         .stats {
             text-align: left;
             font-size: 13px;
@@ -255,8 +306,10 @@
 
 
 <script src="../js/core/transition.js"></script>
+<script src="../js/core/mobile.js"></script>
 <script src="../js/core/navigation.js"></script>
 <script src="../js/data/battleHeroes.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
 <audio id="musicPlayer" loop>
     <source src="../sounds/BGMS.wav" type="audio/wav">
@@ -284,6 +337,153 @@ const statusText =
 const startButton =
     document.getElementById("startBattle");
 
+    // ==========================================
+// MULTIPLAYER HERO SELECTION
+// ==========================================
+
+const isMultiplayer = mode === "multiplayer";
+
+let multiplayerSocket = null;
+let multiplayerHeroState = null;
+
+let multiplayerSeat =
+    sessionStorage.getItem("multiplayerSeat");
+
+function updateMultiplayerNames(players) {
+
+    if (!players) return;
+
+    const p1 = players.find(p => p.seat === "p1");
+    const p2 = players.find(p => p.seat === "p2");
+
+    if (p1) {
+        document.getElementById("player1Title").textContent =
+            p1.username;
+    }
+
+    if (p2) {
+        document.getElementById("player2Title").textContent =
+            p2.username;
+    }
+}
+
+function renderMultiplayerHeroes(state) {
+
+    if (!state) return;
+
+    multiplayerHeroState = state;
+
+    player1Index = state.selections.p1;
+    player2Index = state.selections.p2;
+
+    // Reset cards
+    document.querySelectorAll(".heroCard").forEach(card => {
+        card.classList.remove("selected");
+    });
+
+    // Display Player 1 selection
+    if (player1Index !== null) {
+        updatePreview(1, battleHeroes[player1Index]);
+        markSelected(player1Index);
+    } else {
+        document.getElementById("player1Preview").style.display = "none";
+        document.getElementById("player1Selected").textContent = "Not selected";
+    }
+
+    // Display Player 2 selection
+    if (player2Index !== null) {
+        updatePreview(2, battleHeroes[player2Index]);
+        markSelected(player2Index);
+    } else {
+        document.getElementById("player2Preview").style.display = "none";
+        document.getElementById("player2Selected").textContent = "Not selected";
+    }
+
+    // Selection status
+    if (state.status === "complete") {
+
+        // Save both hero selections on both players' browsers
+sessionStorage.setItem("player1HeroIndex", state.selections.p1);
+sessionStorage.setItem("player2HeroIndex", state.selections.p2);
+
+    if (multiplayerSeat === "p1") {
+
+        statusText.textContent = "✨ HERO SELECTION COMPLETE! CLICK TO START ✨";
+        startButton.style.display = "inline-block";
+
+    } else {
+
+        statusText.textContent = "✨ HERO SELECTION COMPLETE! WAITING FOR PLAYER 1... ✨";
+        startButton.style.display = "none";
+
+    }
+
+} else {
+
+        startButton.style.display = "none";
+
+        if (state.currentSeat === "p2") {
+
+            statusText.textContent =
+                multiplayerSeat === "p2"
+                ? "YOUR TURN — SELECT YOUR HERO"
+                : "WAITING FOR PLAYER 2 TO SELECT...";
+
+        } else if (state.currentSeat === "p1") {
+
+            statusText.textContent =
+                multiplayerSeat === "p1"
+                ? "YOUR TURN — SELECT YOUR HERO"
+                : "WAITING FOR PLAYER 1 TO SELECT...";
+
+        }
+    }
+}
+
+function connectMultiplayerHeroes() {
+
+    
+    multiplayerSocket = io();
+    multiplayerSocket.on("battle-started", () => {
+    goTo("battle.html");
+});
+
+    multiplayerSocket.on("connect", () => {
+
+        const roomId =
+            sessionStorage.getItem("multiplayerRoomId");
+
+        const playerToken =
+            sessionStorage.getItem("multiplayerPlayerToken");
+
+        multiplayerSocket.emit("rejoin-room", {
+            roomId,
+            playerToken
+        }, response => {
+
+            if (!response?.success) {
+                alert("Unable to reconnect to multiplayer room.");
+                return;
+            }
+
+            multiplayerSeat = response.seat;
+
+            updateMultiplayerNames(response.players);
+
+            renderMultiplayerHeroes(response.heroState);
+
+        });
+
+    });
+
+    // Receive selections from both players
+    multiplayerSocket.on("hero-state", state => {
+
+        renderMultiplayerHeroes(state);
+
+    });
+
+}
 
 // PLAYER NAMES
 
@@ -309,15 +509,7 @@ battleHeroes.forEach((hero, index) => {
 
         <div class="role">${hero.role}</div>
 
-        <div class="stats">
-
-            ❤️ HP: ${hero.attributes.hp}<br>
-
-            ⚔️ Attack: ${hero.attributes.attack}<br>
-
-            🛡️ Shield: ${hero.attributes.shield}
-
-        </div>
+        
 
     `;
 
@@ -335,6 +527,14 @@ battleHeroes.forEach((hero, index) => {
 // SELECT HERO
 
 function selectHero(index) {
+
+        if (isMultiplayer) {
+
+        selectMultiplayerHero(index);
+
+        return;
+
+    }
 
     if(selectingPlayer === 1) {
 
@@ -380,7 +580,45 @@ function selectHero(index) {
 
 }
 
+function selectMultiplayerHero(index) {
 
+    if (!multiplayerHeroState) return;
+
+    if (multiplayerHeroState.status !== "selecting")
+        return;
+
+    if (multiplayerHeroState.currentSeat !== multiplayerSeat)
+        return;
+
+    if (
+        Object.values(multiplayerHeroState.selections)
+        .includes(index)
+    ) {
+        alert("This hero has already been selected!");
+        return;
+    }
+
+    multiplayerSocket.emit("hero-action", {
+
+        roomId: sessionStorage.getItem("multiplayerRoomId"),
+
+        heroId: index
+
+    }, response => {
+
+        if (!response?.success) {
+
+            alert(response?.message || "Hero selection failed.");
+
+            return;
+
+        }
+
+        renderMultiplayerHeroes(response.state);
+
+    });
+
+}
 // RANDOM AI HERO
 
 function selectRandomAIHero() {
@@ -457,17 +695,26 @@ startButton.addEventListener("click", () => {
     if(player1Index === null || player2Index === null)
         return;
 
-    sessionStorage.setItem(
-        "player1HeroIndex",
-        player1Index
-    );
+    sessionStorage.setItem("player1HeroIndex", player1Index);
+sessionStorage.setItem("player2HeroIndex", player2Index);
 
-    sessionStorage.setItem(
-        "player2HeroIndex",
-        player2Index
-    );
+if (isMultiplayer) {
+    startButton.disabled = true;
+    startButton.textContent = "STARTING...";
 
+    multiplayerSocket.emit("start-battle", {
+        roomId: sessionStorage.getItem("multiplayerRoomId"),
+        playerToken: sessionStorage.getItem("multiplayerPlayerToken")
+    }, (response) => {
+        if (!response || !response.success) {
+            startButton.disabled = false;
+            startButton.textContent = "START BATTLE";
+            alert(response?.message || "Could not start the battle.");
+        }
+    });
+} else {
     goTo("battle.html");
+}
 
 });
 
@@ -479,6 +726,13 @@ document.getElementById("backButton").onclick = () => {
     history.back();
 
 };
+
+if (isMultiplayer) {
+
+    // Multiplayer uses server-controlled selections.
+    connectMultiplayerHeroes();
+
+}
 </script>
 
 

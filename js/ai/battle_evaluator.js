@@ -21,7 +21,7 @@ const BattleEvaluator = {
     switch(kwami.name){
 
         case "Plagg":
-            estimatedDamage = 80;
+            estimatedDamage = 120;
             break;
 
         case "Roaar":

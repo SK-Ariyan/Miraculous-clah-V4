@@ -4,7 +4,10 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0c081e">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../assets/icons/icon-192.png">
 
 <title>Play</title>
 
@@ -28,7 +31,7 @@
     <div class="modeContainer">
 
         <!-- PASS & PLAY -->
-        <div class="modeCard" id="passPlayBtn">
+        <div class="modeCard" id="passPlayCard">
 
             <h2>👥 Pass & Play</h2>
 
@@ -43,7 +46,7 @@
         </div>
 
         <!-- VS AI -->
-        <div class="modeCard" id="vsAiBtn">
+        <div class="modeCard" id="vsAiCard">
 
             <h2>🤖 VS AI</h2>
 
@@ -58,7 +61,7 @@
         </div>
 
         <!-- MULTIPLAYER -->
-        <div class="modeCard" id="multiplayerBtn">
+        <div class="modeCard">
 
             <h2>🌐 Multiplayer</h2>
 
@@ -67,8 +70,8 @@
             </p>
 
             <button id="multiplayerBtn">
-                Coming Soon
-            </button>
+    Play Online
+</button>
 
         </div>
 
@@ -85,6 +88,7 @@
 <script src="../js/core/navigation.js"></script>
 <script src="../js/game/gameState.js"></script>
 <script src="../js/pages/play.js"></script>
+<script src="../js/core/mobile.js"></script>
 
 </body>
 

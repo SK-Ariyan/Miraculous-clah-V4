@@ -100,7 +100,7 @@ const GameState = {
 
             switch(k.name){
 
-                case "Plagg": return 80;
+                case "Plagg": return 120;
                 case "Roaar": return 50;
                 case "Tussoo": return 60;
                 case "Xuppu": return 60;

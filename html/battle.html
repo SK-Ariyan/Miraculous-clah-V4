@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0c081e">
+    <link rel="manifest" href="../manifest.webmanifest">
+    <link rel="apple-touch-icon" href="../assets/icons/icon-192.png">
     <title>Battle</title>
     <link rel="stylesheet" href="../css/battle.css">
     <link rel="stylesheet" href="../css/transition.css">
@@ -163,14 +168,23 @@
 </audio>
 
 <script>
-    document.getElementById("backBtn").addEventListener("click",()=>{
+    
+document.getElementById("backBtn").addEventListener("click", () => {
 
-    battleMusic.pause();
-    battleMusic.currentTime = 0;
+    if (sessionStorage.getItem("mode") === "multiplayer") {
 
-    goTo("lobby.html");
+        leaveMultiplayerBattle();
+
+    } else {
+
+        battleMusic.pause();
+        battleMusic.currentTime = 0;
+        goTo("lobby.html");
+
+    }
 
 });
+
 </script>
 <script src="../js/core/transition.js"></script>
 
@@ -196,7 +210,8 @@
 
 <!-- Battle -->
 
-
+<script src="/socket.io/socket.io.js"></script>
+<script src="../js/core/mobile.js"></script>
 <script src="/js/battle/battle.js"></script>
 </body>
 

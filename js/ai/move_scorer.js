@@ -141,27 +141,27 @@ for(const enemyKwami of state.enemyTeam){
     switch(enemyKwami.name){
 
         case "Roaar":
-            damage = 50;
-            break;
-
-        case "Plagg":
             damage = 80;
             break;
 
+        case "Plagg":
+            damage = 120;
+            break;
+
         case "Longg":
-            damage = 45;
+            damage = 70;
             break;
 
         case "Kaalki":
-            damage = 40;
+            damage = 60;
             break;
 
         case "Tussoo":
-            damage = 60;
+            damage = 80;
             break;
 
         case "Xuppu":
-            damage = 60;
+            damage = 90;
             break;
 
     }
