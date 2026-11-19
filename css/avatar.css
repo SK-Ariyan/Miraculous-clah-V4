@@ -249,3 +249,150 @@ body {
         padding: 8px 14px;
     }
 }
+
+@media (max-width: 1000px) and (orientation: landscape) and (pointer: coarse) {
+    body:has(#heroImage) #orientationOverlay {
+        display: none;
+    }
+
+    body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        align-items: flex-start;
+        padding:
+            calc(env(safe-area-inset-top) + 56px)
+            max(10px, env(safe-area-inset-right))
+            max(12px, env(safe-area-inset-bottom))
+            max(10px, env(safe-area-inset-left));
+    }
+
+    body #backBtn {
+        position: fixed;
+        top: max(6px, env(safe-area-inset-top));
+        left: max(6px, env(safe-area-inset-left));
+        z-index: 20;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    body .container {
+        width: 100%;
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 12px;
+        border-radius: 16px;
+    }
+
+    body .container h1 {
+        margin-bottom: 8px;
+        font-size: clamp(21px, 6vw, 25px);
+        line-height: 1.15;
+    }
+
+    body .preview {
+        gap: clamp(4px, 2vw, 10px);
+        margin-bottom: 8px;
+    }
+
+    body #heroImage {
+        width: min(190px, 54vw);
+        height: clamp(175px, 31dvh, 220px);
+        min-width: 0;
+        padding: 8px;
+        border-radius: 14px;
+    }
+
+    body #prevBtn,
+    body #nextBtn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        flex: 0 0 44px;
+        font-size: 17px;
+    }
+
+    body #heroName {
+        margin-bottom: 4px;
+        font-size: 21px;
+        line-height: 1.2;
+    }
+
+    body #heroQuote {
+        margin-bottom: 10px;
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    body #nameInput {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+    }
+
+    body #selectBtn {
+        min-height: 44px;
+        margin-top: 10px;
+        padding: 10px 24px;
+    }
+
+    body #statusText {
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 1000px) and (orientation: landscape) and (pointer: coarse) and (max-height: 500px) {
+    body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        align-items: flex-start;
+        padding:
+            calc(env(safe-area-inset-top) + 52px)
+            max(10px, env(safe-area-inset-right))
+            max(8px, env(safe-area-inset-bottom))
+            max(10px, env(safe-area-inset-left));
+    }
+
+    body #backBtn {
+        position: fixed;
+        top: max(6px, env(safe-area-inset-top));
+        left: max(6px, env(safe-area-inset-left));
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    body .container {
+        padding: 9px 12px;
+    }
+
+    body .container h1 {
+        margin-bottom: 5px;
+        font-size: 20px;
+    }
+
+    body #heroImage {
+        width: min(180px, 34vw);
+        height: clamp(120px, 37dvh, 150px);
+    }
+
+    body .preview {
+        margin-bottom: 5px;
+    }
+
+    body #heroName {
+        font-size: 19px;
+    }
+
+    body #heroQuote {
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    body #selectBtn {
+        margin-top: 6px;
+    }
+}

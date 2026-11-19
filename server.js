@@ -145,6 +145,7 @@ function getHeroSnapshot(room) {
     if (!hero) return null;
 
     return {
+        roomId: room.id,
         status: hero.status,
         currentSeat: hero.currentSeat,
         selections: {
@@ -172,6 +173,7 @@ function getRoomPlayers(room) {
 function getDraftSnapshot(room) {
     const draft = room.draftState;
     return {
+        roomId: room.id,
         status: draft.status,
         turnIndex: draft.turnIndex,
         totalTurns: draft.sequence.length,
@@ -195,6 +197,24 @@ function broadcastRoomUpdate(room) {
         host: room.host,
         matchStarted: room.matchStarted
     });
+}
+
+function closeRoom(room, eventName, message) {
+    io.to(room.id).emit(eventName, { roomId: room.id, message });
+
+    room.players.forEach(player => {
+        const playerSocket = io.sockets.sockets.get(player.socketId);
+        if (!playerSocket) return;
+
+        playerSocket.leave(room.id);
+        if (playerSocket.data.roomId === room.id) {
+            playerSocket.data.roomId = null;
+            playerSocket.data.playerToken = null;
+            playerSocket.data.seat = null;
+        }
+    });
+
+    rooms.delete(room.id);
 }
 
 io.on("connection", (socket) => {
@@ -221,6 +241,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("create-room", (data, callback) => {
+        if (socket.data.roomId) {
+            return acknowledge(callback, {
+                success: false,
+                message: "Leave your current room before creating another."
+            });
+        }
+
         const profile = parsePlayerProfile(data);
         if (profile.error) {
             return acknowledge(callback, { success: false, message: profile.error });
@@ -268,6 +295,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("join-room", (data, callback) => {
+        if (socket.data.roomId) {
+            return acknowledge(callback, {
+                success: false,
+                message: "Leave your current room before joining another."
+            });
+        }
+
         const roomId = normalizeRoomId(data?.roomId);
         const profile = parsePlayerProfile(data);
 
@@ -325,6 +359,12 @@ io.on("connection", (socket) => {
         if (!room || !player) {
             return acknowledge(callback, { success: false, message: "This room session could not be restored." });
         }
+        if (socket.data.roomId && socket.data.roomId !== room.id) {
+            return acknowledge(callback, {
+                success: false,
+                message: "Leave your current room before reconnecting to another."
+            });
+        }
 
         const previousSocketId = player.socketId;
         player.socketId = socket.id;
@@ -345,6 +385,7 @@ io.on("connection", (socket) => {
             players: getRoomPlayers(room),
             host: room.host,
             matchStarted: room.matchStarted,
+            battleStarted: room.battleStarted,
             draftState: room.draftState ? getDraftSnapshot(room) : null,
             heroState: getHeroSnapshot(room),
             battle: room.battle ? battleEngine.snapshot(room) : null
@@ -616,7 +657,9 @@ socket.on("battle-action", (data, callback) => {
         return acknowledge(callback, { success: false, message: "Invalid action ID." });
     }
     if (room.battle.processedActionIds?.includes(actionId)) {
-        return acknowledge(callback, { success: true, state: battleEngine.snapshot(room), duplicate: true });
+        const state = battleEngine.snapshot(room);
+        io.to(room.id).emit("battle-state", state);
+        return acknowledge(callback, { success: true, state, duplicate: true });
     }
 
     let result;
@@ -637,8 +680,13 @@ socket.on("battle-action", (data, callback) => {
     room.battle.processedActionIds.push(actionId);
 
     const state = battleEngine.snapshot(room);
+    io.to(room.id).emit("battle-action-result", {
+        ...result.event,
+        actionId,
+        roomId: room.id
+    });
     io.to(room.id).emit("battle-state", state);
-    acknowledge(callback, { success: true, state });
+    acknowledge(callback, { success: true, state, actionId });
 });
 
 socket.on("battle-snapshot", (data, callback) => {
@@ -660,51 +708,63 @@ socket.on("leave-room", (data, callback) => {
     const roomId = normalizeRoomId(data?.roomId);
     const room = rooms.get(roomId);
 
+    if (!room) {
+        return acknowledge(callback, { success: true, closed: true, alreadyClosed: true });
+    }
+
+    const playerToken = typeof data?.playerToken === "string"
+        ? data.playerToken
+        : socket.data.playerToken;
     const player = room?.players.find(candidate =>
-        candidate.token === socket.data.playerToken &&
-        candidate.socketId === socket.id
+        candidate.token === playerToken &&
+        (candidate.socketId === socket.id || candidate.socketId === null)
     );
 
-    if (!room || !player || room.matchStarted) {
+    if (!player || (socket.data.roomId && socket.data.roomId !== room.id)) {
         return acknowledge(callback, {
             success: false,
-            message: "Unable to cancel this room."
+            message: "Unable to leave this room."
         });
     }
 
-    // HOST CANCELS: CLOSE THE ENTIRE ROOM
-    if (player.seat === "p1") {
+    if (player.socketId === null) {
+        player.socketId = socket.id;
+        socket.data.roomId = room.id;
+        socket.data.playerToken = player.token;
+        socket.data.seat = player.seat;
+        socket.join(room.id);
+    }
 
-        io.to(room.id).emit("room-closed", {
-            message: "The host cancelled the room."
-        });
+    if (room.battleStarted) {
+        if (room.battle?.status !== "finished") {
+            return acknowledge(callback, {
+                success: false,
+                message: "Surrender to leave an active battle."
+            });
+        }
 
-        // Clear room information from both connected players
-        room.players.forEach(member => {
-            const memberSocket = io.sockets.sockets.get(member.socketId);
-
-            if (memberSocket) {
-                memberSocket.leave(room.id);
-                memberSocket.data.roomId = null;
-                memberSocket.data.playerToken = null;
-                memberSocket.data.seat = null;
-            }
-        });
-
-        rooms.delete(room.id);
-
+        closeRoom(room, "match-closed", "The completed match has been closed.");
         acknowledge(callback, { success: true, closed: true });
-
-        console.log("Room cancelled by host:", roomId);
-
+        console.log("Completed match closed:", roomId);
         return;
     }
 
-    // PLAYER 2 LEAVES: KEEP THE HOST'S ROOM
+    if (room.matchStarted) {
+        closeRoom(room, "room-closed", "The match was cancelled because a player left.");
+        acknowledge(callback, { success: true, closed: true });
+        console.log("Match cancelled during draft or hero selection:", roomId);
+        return;
+    }
+
+    if (player.seat === "p1") {
+        closeRoom(room, "room-closed", "The host cancelled the room.");
+        acknowledge(callback, { success: true, closed: true });
+        console.log("Room cancelled by host:", roomId);
+        return;
+    }
+
     socket.leave(room.id);
-
     room.players = room.players.filter(member => member.token !== player.token);
-
     socket.data.roomId = null;
     socket.data.playerToken = null;
     socket.data.seat = null;
@@ -712,6 +772,7 @@ socket.on("leave-room", (data, callback) => {
     broadcastRoomUpdate(room);
 
     io.to(room.id).emit("player-left", {
+        roomId: room.id,
         players: getRoomPlayers(room)
     });
 
@@ -772,6 +833,7 @@ socket.on("surrender-battle", (data, callback) => {
 
     // Notify the opponent that the player surrendered
     io.to(opponent.socketId).emit("opponent-surrendered", {
+        roomId: room.id,
         quitterSeat: quitter.seat,
         quitterName: quitter.username,
         winnerSeat: opponent.seat,
@@ -814,7 +876,10 @@ socket.on("surrender-battle", (data, callback) => {
         player.socketId = null;
         if (player.seat === "p1") room.host = null;
         broadcastRoomUpdate(room);
-        io.to(room.id).emit("player-left", { players: getRoomPlayers(room) });
+        io.to(room.id).emit("player-left", {
+            roomId: room.id,
+            players: getRoomPlayers(room)
+        });
     });
 
 });

@@ -187,3 +187,7 @@ This project is a personal learning journey to improve skills in JavaScript, gam
 If you like this project, consider giving it a ⭐ on GitHub.
 
 Feedback, suggestions, and bug reports are always welcome.
+
+## Local Multiplayer Integration Check
+
+Run `npm run test:multiplayer` to start a temporary local server and exercise a full two-player room, draft, hero selection, and battle action flow. The check verifies that both Socket.IO clients receive identical, ordered combat events and narration. It does not deploy the app, and the test script is not served by the production server.

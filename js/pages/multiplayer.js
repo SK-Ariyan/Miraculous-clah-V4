@@ -36,12 +36,17 @@ const PLAYER_TOKEN_STORAGE_KEY = "multiplayerPlayerToken";
 
 // BACK BUTTON
 backBtn.onclick = () => {
-    sessionStorage.removeItem(ROOM_STORAGE_KEY);
-    sessionStorage.removeItem(PLAYER_TOKEN_STORAGE_KEY);
-    sessionStorage.removeItem("multiplayerSeat");
-    if (sessionStorage.getItem("mode") === "multiplayer")
-        sessionStorage.removeItem("mode");
-    goTo("play.html");
+    backBtn.disabled = true;
+    multiplayerSession.leave(socket, response => {
+        backBtn.disabled = false;
+        if (!response?.success) {
+            alert(response?.message || "Unable to leave the multiplayer room.");
+            return;
+        }
+
+        resetRoomScreen();
+        goTo("play.html");
+    });
 };
 
 function saveRoomSession(response) {
@@ -50,6 +55,7 @@ function saveRoomSession(response) {
     if (response.playerToken)
         sessionStorage.setItem(PLAYER_TOKEN_STORAGE_KEY, response.playerToken);
     sessionStorage.setItem("multiplayerSeat", response.seat);
+    sessionStorage.setItem("mode", "multiplayer");
 }
 
 
@@ -68,6 +74,7 @@ createRoomBtn.onclick = () => {
             return;
         }
 
+        multiplayerSession.clear({ clearTeams: true });
         saveRoomSession(response);
         showRoom(response.roomId, response.players, response.host);
 
@@ -92,6 +99,7 @@ joinRoomBtn.onclick = () => {
             return;
         }
 
+        multiplayerSession.clear({ clearTeams: true });
         saveRoomSession(response);
         showRoom(response.roomId, response.players, response.host);
 
@@ -150,7 +158,8 @@ cancelRoomBtn.onclick = () => {
     cancelRoomBtn.disabled = true;
 
     socket.emit("leave-room", {
-        roomId: currentRoom
+        roomId: currentRoom,
+        playerToken: sessionStorage.getItem(PLAYER_TOKEN_STORAGE_KEY)
     }, response => {
 
         cancelRoomBtn.disabled = false;
@@ -172,10 +181,7 @@ function resetRoomScreen() {
     currentRoom = null;
     isHost = false;
 
-    sessionStorage.removeItem(ROOM_STORAGE_KEY);
-    sessionStorage.removeItem(PLAYER_TOKEN_STORAGE_KEY);
-    sessionStorage.removeItem("multiplayerSeat");
-    sessionStorage.removeItem("mode");
+    multiplayerSession.clear({ clearTeams: true });
 
     roomSection.style.display = "none";
     roomActions.style.display = "block";
@@ -246,22 +252,43 @@ socket.on("connect", () => {
     if (!roomId || !playerToken) return;
 
     socket.emit("rejoin-room", { roomId, playerToken }, response => {
+        if (sessionStorage.getItem(ROOM_STORAGE_KEY) !== roomId ||
+            sessionStorage.getItem(PLAYER_TOKEN_STORAGE_KEY) !== playerToken) {
+            return;
+        }
+
         if (!response?.success) {
-            sessionStorage.removeItem(ROOM_STORAGE_KEY);
-            sessionStorage.removeItem(PLAYER_TOKEN_STORAGE_KEY);
-            sessionStorage.removeItem("multiplayerSeat");
+            resetRoomScreen();
             roomStatus.textContent = response?.message || "Could not restore the room.";
-            roomActions.style.display = "block";
-            roomSection.style.display = "none";
             return;
         }
 
         saveRoomSession(response);
+
+        if (response.battle?.status === "finished") {
+            multiplayerSession.leave(socket, cleanupResponse => {
+                if (!cleanupResponse?.success) {
+                    showRoom(response.roomId, response.players, response.host);
+                    roomStatus.textContent = cleanupResponse?.message ||
+                        "Could not close the completed match.";
+                    return;
+                }
+
+                resetRoomScreen();
+                roomStatus.textContent = "The previous match has ended. Create or join a room.";
+            });
+            return;
+        }
+
         showRoom(response.roomId, response.players, response.host);
 
         if (response.matchStarted) {
-            sessionStorage.setItem("mode", "multiplayer");
-            goTo("kwami.html");
+            const destination = response.battle
+                ? "battle.html"
+                : response.heroState
+                    ? "hero-selection.html"
+                    : "kwami.html";
+            goTo(destination);
         }
     });
 });
@@ -292,10 +319,17 @@ startBtn.onclick = () => {
 // ROOM CLOSED BY HOST
 socket.on("room-closed", (data) => {
 
+    if (data?.roomId && data.roomId !== currentRoom) return;
     resetRoomScreen();
 
     alert(data?.message || "The room has been closed.");
 
+});
+
+socket.on("match-closed", data => {
+    if (data?.roomId && data.roomId !== currentRoom) return;
+    resetRoomScreen();
+    roomStatus.textContent = "The previous match has ended. Create or join a room.";
 });
 
 
@@ -311,6 +345,7 @@ socket.on("match-starting", (data) => {
 // PLAYER LEFT
 socket.on("player-left", (data) => {
 
+    if (data?.roomId !== currentRoom) return;
     updatePlayers(data.players);
 
     roomStatus.textContent = "A player left the room.";

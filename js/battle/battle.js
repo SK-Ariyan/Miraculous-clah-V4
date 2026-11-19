@@ -4,6 +4,7 @@ const isMultiplayer = sessionStorage.getItem("mode") === "multiplayer";
 const battleSocket = isMultiplayer ? io() : null;
 
 let multiplayerActionCounter = 0;
+let multiplayerLogCursor = null;
 
 
 
@@ -17,6 +18,24 @@ let player1Name = "Player 1";
 let player2Name = "Player 2";
 
 let playerName = localStorage.getItem("playerName") || "Player";
+
+function appendMultiplayerLogMessages(messages, startIndex) {
+    if (!Array.isArray(messages)) return;
+
+    const start = Number.isInteger(startIndex)
+        ? startIndex
+        : (multiplayerLogCursor || 0);
+
+    if (multiplayerLogCursor === null) {
+        multiplayerLogCursor = start;
+    }
+
+    const skipCount = Math.max(0, multiplayerLogCursor - start);
+    messages.slice(skipCount).forEach(message => {
+        if (typeof message === "string") addLog(message);
+    });
+    multiplayerLogCursor = Math.max(multiplayerLogCursor, start + messages.length);
+}
 
 if (isMultiplayer) {
 
@@ -61,8 +80,31 @@ player1Team.forEach(kwami => kwami.cooldown = 0);
 player2Team.forEach(kwami => kwami.cooldown = 0);
 
 if (isMultiplayer) {
+    const handleMultiplayerActionEvent = createMultiplayerActionEventHandler({
+        getRoomId: () => multiplayerRoomId,
+        appendLogMessages: appendMultiplayerLogMessages,
+        playAttackAnimation: attackerSeat => playAttackAnimation(false, attackerSeat),
+        playHurtAnimation: targetSeat => {
+            const targetSprite = targetSeat === "p1" ? player1Sprite : player2Sprite;
+            const targetHero = targetSeat === "p1" ? player1Hero : player2Hero;
+            playHurtAnimation(targetSprite, targetHero);
+        }
+    });
+    battleSocket.on("battle-action-result", handleMultiplayerActionEvent);
+
     battleSocket.on("battle-state", state => {
-        if (!state || !state.players) return;
+        if (!state || state.roomId !== multiplayerRoomId || !state.players) return;
+
+        if (Array.isArray(state.log)) {
+            if (multiplayerLogCursor === null) {
+                multiplayerLogCursor = state.log.length;
+            } else if (state.log.length > multiplayerLogCursor) {
+                appendMultiplayerLogMessages(
+                    state.log.slice(multiplayerLogCursor),
+                    multiplayerLogCursor
+                );
+            }
+        }
 
         const p1 = state.players.p1;
         const p2 = state.players.p2;
@@ -110,16 +152,17 @@ if (isMultiplayer) {
         updateTurn();
         createAbilityButtons();
 
-        if (state.log && state.log.length) {
-            addLog(state.log[state.log.length - 1]);
-        }
-
         if (state.status === "finished" && state.winnerSeat) {
             checkWinConditions();
             winnerText.textContent = `🏆 ${state.winnerName.toUpperCase()} WINS!`;
             victoryScreen.style.display = "flex";
             setTimeout(() => victoryScreen.classList.add("show"), 20);
         }
+    });
+
+    battleSocket.on("match-closed", data => {
+        if (data?.roomId !== multiplayerRoomId) return;
+        returnFromMultiplayerMatch();
     });
 }
 
@@ -457,6 +500,7 @@ const battleTracks = [
 if (isMultiplayer) {
 
     battleSocket.on("opponent-surrendered", (data) => {
+        if (data?.roomId !== multiplayerRoomId) return;
 
         console.log("Opponent surrendered:", data);
 
@@ -944,7 +988,11 @@ continueBtn.addEventListener("click", () => {
 
     localStorage.setItem("musicTime", 0);
 
-    goTo("lobby.html");
+    if (isMultiplayer) {
+        finishMultiplayerMatch();
+    } else {
+        goTo("lobby.html");
+    }
 
 });
 
@@ -1120,15 +1168,16 @@ addLog("🐭 Multitude recharged!");
 }
 
 
-function playAttackAnimation(holdSprite = false) {
+function playAttackAnimation(holdSprite = false, attackerSeat = currentTurn) {
 
     return new Promise(resolve => {
 
-        const hero = currentTurn == 1
+        const attackingPlayerOne = attackerSeat === 1 || attackerSeat === "p1";
+        const hero = attackingPlayerOne
             ? player1Sprite
             : player2Sprite;
 
-        const heroData = currentTurn == 1
+        const heroData = attackingPlayerOne
             ? player1Hero
             : player2Hero;
 
@@ -1136,7 +1185,7 @@ function playAttackAnimation(holdSprite = false) {
         hero.src = heroData.cards.attack;
 
         // Start movement animation
-        const animationClass = currentTurn == 1
+        const animationClass = attackingPlayerOne
             ? "heroAttackRight"
             : "heroAttackLeft";
 
@@ -1606,6 +1655,29 @@ if (mode == "ai" && currentTurn == 2) {
 }
 
 
+let multiplayerReturnScheduled = false;
+
+function returnFromMultiplayerMatch() {
+    if (multiplayerReturnScheduled) return;
+    multiplayerReturnScheduled = true;
+    multiplayerSession.clear({ clearTeams: true });
+    goTo("lobby.html");
+}
+
+function finishMultiplayerMatch() {
+    battleMusic.pause();
+    battleMusic.currentTime = 0;
+
+    multiplayerSession.leave(battleSocket, response => {
+        if (!response?.success) {
+            alert(response?.message || "Unable to close the completed match.");
+            return;
+        }
+
+        returnFromMultiplayerMatch();
+    });
+}
+
 function leaveMultiplayerBattle() {
 
     battleMusic.pause();
@@ -1616,17 +1688,19 @@ function leaveMultiplayerBattle() {
         playerToken: multiplayerPlayerToken
     }, (response) => {
 
-        // Clear old multiplayer session
-        sessionStorage.removeItem("multiplayerRoomId");
-        sessionStorage.removeItem("multiplayerPlayerToken");
-        sessionStorage.removeItem("multiplayerSeat");
+        if (response?.success) {
+            returnFromMultiplayerMatch();
+            return;
+        }
 
-        sessionStorage.removeItem("player1HeroIndex");
-        sessionStorage.removeItem("player2HeroIndex");
-
-        sessionStorage.removeItem("mode");
-
-        goTo("lobby.html");
+        multiplayerSession.leave(battleSocket, cleanupResponse => {
+            if (cleanupResponse?.success) {
+                returnFromMultiplayerMatch();
+            } else {
+                alert(response?.message || cleanupResponse?.message ||
+                    "Unable to leave the multiplayer battle.");
+            }
+        });
 
     });
 

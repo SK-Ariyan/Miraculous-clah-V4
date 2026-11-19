@@ -310,6 +310,7 @@
 <script src="../js/core/navigation.js"></script>
 <script src="../js/data/battleHeroes.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="../js/multiplayer/session.js"></script>
 
 <audio id="musicPlayer" loop>
     <source src="../sounds/BGMS.wav" type="audio/wav">
@@ -369,7 +370,8 @@ function updateMultiplayerNames(players) {
 
 function renderMultiplayerHeroes(state) {
 
-    if (!state) return;
+    if (!state || state.roomId !== sessionStorage.getItem("multiplayerRoomId"))
+        return;
 
     multiplayerHeroState = state;
 
@@ -444,8 +446,9 @@ function connectMultiplayerHeroes() {
 
     
     multiplayerSocket = io();
-    multiplayerSocket.on("battle-started", () => {
-    goTo("battle.html");
+    multiplayerSocket.on("battle-started", state => {
+    if (state?.roomId === sessionStorage.getItem("multiplayerRoomId"))
+        goTo("battle.html");
 });
 
     multiplayerSocket.on("connect", () => {
@@ -456,19 +459,41 @@ function connectMultiplayerHeroes() {
         const playerToken =
             sessionStorage.getItem("multiplayerPlayerToken");
 
+        if (!roomId || !playerToken) {
+            multiplayerSession.clear({ clearTeams: true });
+            goTo("multiplayer.html");
+            return;
+        }
+
         multiplayerSocket.emit("rejoin-room", {
             roomId,
             playerToken
         }, response => {
 
             if (!response?.success) {
-                alert("Unable to reconnect to multiplayer room.");
+                multiplayerSession.clear({ clearTeams: true });
+                goTo("multiplayer.html");
                 return;
             }
 
             multiplayerSeat = response.seat;
 
             updateMultiplayerNames(response.players);
+
+            if (response.battle?.status === "finished") {
+                multiplayerSession.leave(multiplayerSocket, () => goTo("multiplayer.html"));
+                return;
+            }
+
+            if (response.battle) {
+                goTo("battle.html");
+                return;
+            }
+
+            if (!response.heroState) {
+                goTo("kwami.html");
+                return;
+            }
 
             renderMultiplayerHeroes(response.heroState);
 
@@ -482,6 +507,16 @@ function connectMultiplayerHeroes() {
         renderMultiplayerHeroes(state);
 
     });
+
+    const handleRoomClosed = data => {
+        if (data?.roomId !== sessionStorage.getItem("multiplayerRoomId"))
+            return;
+        multiplayerSession.clear({ clearTeams: true });
+        goTo("multiplayer.html");
+    };
+
+    multiplayerSocket.on("room-closed", handleRoomClosed);
+    multiplayerSocket.on("match-closed", handleRoomClosed);
 
 }
 
@@ -723,7 +758,19 @@ if (isMultiplayer) {
 
 document.getElementById("backButton").onclick = () => {
 
-    history.back();
+    if (!isMultiplayer) {
+        history.back();
+        return;
+    }
+
+    multiplayerSession.leave(multiplayerSocket, response => {
+        if (!response?.success) {
+            alert(response?.message || "Unable to leave the multiplayer room.");
+            return;
+        }
+
+        goTo("multiplayer.html");
+    });
 
 };
 

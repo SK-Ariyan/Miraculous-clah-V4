@@ -34,6 +34,28 @@ const KWAMI_STATS = {
     Bark: { hp: 30, damage: 5, speed: 10, luck: 5, charge: 3 }
 };
 
+const ABILITY_DETAILS = {
+    Tikki: { name: "Lucky Charm", message: "✨ Tikki used Lucky Charm!" },
+    Plagg: { name: "Cataclysm", message: "💥 Plagg used Cataclysm!" },
+    Wayz: { name: "Shell-ter", message: "🛡 Wayz used Shell-ter!" },
+    Trics: { name: "Mirage", message: "🦊 Trics used Mirage!" },
+    Pollen: { name: "Venom", message: "🐝 Pollen used Venom!" },
+    Roaar: { name: "Clout", message: "🦁 Roaar used Clout!" },
+    Longg: { name: "Elemental Burst", message: "🐉 Longg used Elemental Burst!" },
+    Kaalki: { name: "Voyage", message: "🐎 Kaalki used Voyage!" },
+    Fluff: { name: "Burrow", message: "🐇 Fluff used Burrow!" },
+    Sass: { name: "Second Chance", message: "🐍 Sass used Second Chance!" },
+    Daizzi: { name: "Jubilation", message: "🐷 Daizzi used Jubilation!" },
+    Mullo: { name: "Multitude", message: "🐭 Mullo used Multitude!" },
+    Nuroo: { name: "Akumatize", message: "🦋 Nuroo used Akumatize!" },
+    Orikko: { name: "Sublimation", message: "🪽 Orikko used Sublimation!" },
+    Stomp: { name: "Resistance", message: "🐂 Stomp used Resistance!" },
+    Tussoo: { name: "Genesis Feast", message: "🐖 Tussoo used Genesis Feast!" },
+    Xuppu: { name: "Uproar", message: "🐵 Xuppu used Uproar!" },
+    Ziggy: { name: "Genesis", message: "🐐 Ziggy used Genesis!" },
+    Bark: { name: "Copycat", message: "🐶 Bark used Copycat!" }
+};
+
 function createPlayer(seat, heroId, teamNames, username) {
     const hero = HEROES[heroId];
     const team = teamNames.map(name => {
@@ -145,6 +167,7 @@ function snapshot(room) {
     if (!room.battle) return null;
     const battle = room.battle;
     return {
+        roomId: room.id,
         status: battle.status,
         currentTurn: battle.currentTurn,
         sequence: battle.sequence,
@@ -181,6 +204,84 @@ function publicPlayer(player) {
         regenTurns: player.regenTurns,
         passiveDisabled: player.passiveDisabled,
         abilityBoost: player.abilityBoost
+    };
+}
+
+function changedPlayerEffects(beforePlayer, afterPlayer) {
+    const fields = [
+        "hp", "maxHp", "shield", "stunned", "frozen", "dodge", "immune",
+        "damageBuff", "damageReduction", "regenTurns", "passiveDisabled",
+        "abilityBoost"
+    ];
+    const changes = {};
+
+    fields.forEach(field => {
+        if (beforePlayer[field] !== afterPlayer[field]) {
+            changes[field] = {
+                before: beforePlayer[field],
+                after: afterPlayer[field]
+            };
+        }
+    });
+
+    const beforeCooldowns = new Map(beforePlayer.team.map(kwami => [kwami.name, kwami.cooldown]));
+    const cooldownChanges = afterPlayer.team
+        .filter(kwami => beforeCooldowns.get(kwami.name) !== kwami.cooldown)
+        .map(kwami => ({
+            kwamiName: kwami.name,
+            before: beforeCooldowns.get(kwami.name),
+            after: kwami.cooldown
+        }));
+
+    if (cooldownChanges.length) changes.cooldowns = cooldownChanges;
+    return changes;
+}
+
+function createActionEvent(before, after, actionType, abilityName, directDamage) {
+    const actorSeat = before.currentTurn;
+    const targetSeat = actorSeat === "p1" ? "p2" : "p1";
+    const attacker = after.players[actorSeat];
+    const target = after.players[targetSeat];
+    const previousTarget = before.players[targetSeat];
+    const messages = after.log.slice(before.log.length);
+
+    return {
+        sequence: after.sequence,
+        actionType,
+        actionName: actionType === "normal"
+            ? "Normal Attack"
+            : (ABILITY_DETAILS[abilityName]?.name || abilityName),
+        abilityName: abilityName || null,
+        actor: { seat: actorSeat, username: attacker.username },
+        attacker: {
+            seat: attacker.seat,
+            username: attacker.username,
+            heroName: attacker.heroName
+        },
+        target: {
+            seat: target.seat,
+            username: target.username,
+            heroName: target.heroName
+        },
+        damage: {
+            hp: Math.max(0, previousTarget.hp - target.hp),
+            shield: Math.max(0, previousTarget.shield - target.shield),
+            total: Math.max(0, previousTarget.hp - target.hp) +
+                Math.max(0, previousTarget.shield - target.shield)
+        },
+        directDamage,
+        effects: {
+            players: {
+                p1: changedPlayerEffects(before.players.p1, after.players.p1),
+                p2: changedPlayerEffects(before.players.p2, after.players.p2)
+            },
+            extraTurn: messages.includes("Extra Turn!"),
+            doubleAttack: messages.includes("Double Attack!"),
+            doubleAttackReady: after.doubleAttack
+        },
+        messages,
+        logStart: before.log.length,
+        logEnd: after.log.length
     };
 }
 
@@ -274,7 +375,9 @@ function applyDamage(battle, attackerSeat, amount) {
         return;
     }
 
+    let shieldDamage = 0;
     if (!attacker.chaosIllusion && defender.shield > 0) {
+        const previousShield = defender.shield;
         if (defender.shield >= amount) {
             defender.shield -= amount;
             amount = 0;
@@ -282,9 +385,15 @@ function applyDamage(battle, attackerSeat, amount) {
             amount -= defender.shield;
             defender.shield = 0;
         }
+        shieldDamage = previousShield - defender.shield;
     }
 
+    const previousHp = defender.hp;
     defender.hp = Math.max(0, defender.hp - amount);
+    if (battle.currentActionDamage) {
+        battle.currentActionDamage.hp += previousHp - defender.hp;
+        battle.currentActionDamage.shield += shieldDamage;
+    }
 }
 
 function checkWinner(battle) {
@@ -301,8 +410,12 @@ function performNormalAttack(room) {
     const battle = room.battle;
     if (!battle || battle.status !== "active") return { success: false, message: "The battle is not active." };
 
+    const before = snapshot(room);
+    const directDamage = { hp: 0, shield: 0 };
+    battle.currentActionDamage = directDamage;
     const attackerSeat = battle.currentTurn;
     const attacker = battle.players[attackerSeat];
+    battle.log.push(`⚔ ${attacker.username} used Normal Attack!`);
 
     if (Math.random() * 100 < 5) {
         battle.log.push("Attack Missed!");
@@ -330,7 +443,11 @@ function performNormalAttack(room) {
     checkWinner(battle);
     battle.sequence++;
     if (battle.status === "active") endTurn(battle);
-    return { success: true };
+    battle.currentActionDamage = null;
+    return {
+        success: true,
+        event: createActionEvent(before, snapshot(room), "normal", null, directDamage)
+    };
 }
 
 function performAbility(room, kwamiName) {
@@ -344,6 +461,9 @@ function performAbility(room, kwamiName) {
     if (!kwami) return { success: false, message: "That Kwami does not belong to the active player." };
     if (kwami.cooldown !== 0) return { success: false, message: "Ability is on cooldown." };
 
+    const before = snapshot(room);
+    const directDamage = { hp: 0, shield: 0 };
+    battle.currentActionDamage = directDamage;
     const miss = () => Math.random() * 100 < 5;
     const criticalAbility = (damage) => {
         if (miss()) {
@@ -368,7 +488,7 @@ function performAbility(room, kwamiName) {
         });
     };
 
-    battle.log.push(`${kwamiName} used an ability.`);
+    battle.log.push(ABILITY_DETAILS[kwamiName]?.message || `${kwamiName} used an ability.`);
 
     switch (kwamiName) {
         case "Tikki":
@@ -398,12 +518,15 @@ function performAbility(room, kwamiName) {
             criticalAbility(100);
             battle.extraTurn = true;
             break;
-        case "Longg":
+        case "Longg": {
             criticalAbility(80);
             heal(20);
             battle.doubleAttack = true;
+            const longgDamageBefore = defender.hp;
             defender.hp = Math.max(0, defender.hp - 10);
+            directDamage.hp += longgDamageBefore - defender.hp;
             break;
+        }
         case "Kaalki":
             attacker.dodge = true;
             criticalAbility(60);
@@ -470,7 +593,15 @@ function performAbility(room, kwamiName) {
                     case "Trics": criticalAbility(40); heal(10); battle.extraTurn = true; break;
                     case "Pollen": criticalAbility(30); defender.stunned = true; break;
                     case "Roaar": criticalAbility(50); battle.extraTurn = true; break;
-                    case "Longg": criticalAbility(45); heal(10); battle.doubleAttack = true; defender.hp = Math.max(0, defender.hp - 10); break;
+                    case "Longg": {
+                        criticalAbility(45);
+                        heal(10);
+                        battle.doubleAttack = true;
+                        const longgDamageBefore = defender.hp;
+                        defender.hp = Math.max(0, defender.hp - 10);
+                        directDamage.hp += longgDamageBefore - defender.hp;
+                        break;
+                    }
                     case "Kaalki": attacker.dodge = true; criticalAbility(40); defender.shield = 0; break;
                     case "Fluff": criticalAbility(40); reduceAlliesCooldowns(10); break;
                     case "Sass": criticalAbility(20); reduceAlliesCooldowns(1); battle.extraTurn = true; break;
@@ -506,7 +637,11 @@ function performAbility(room, kwamiName) {
     checkWinner(battle);
     battle.sequence++;
     if (battle.status === "active") endTurn(battle);
-    return { success: true };
+    battle.currentActionDamage = null;
+    return {
+        success: true,
+        event: createActionEvent(before, snapshot(room), "ability", kwamiName, directDamage)
+    };
 }
 
 module.exports = { initializeBattle, snapshot, performNormalAttack, performAbility };

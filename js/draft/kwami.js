@@ -132,6 +132,7 @@ let multiplayerSeat = null;
 let multiplayerDraftState = null;
 let multiplayerActionPending = false;
 let multiplayerRedirectScheduled = false;
+let multiplayerRedirectTimer = null;
 
 // ==========================
 // UPDATE UI
@@ -510,16 +511,38 @@ function startMultiplayerDraft(){
     multiplayerSocket = io({ reconnection: true });
 
     multiplayerSocket.on("connect", ()=>{
+        if (sessionStorage.getItem("multiplayerRoomId") !== roomId ||
+            sessionStorage.getItem("multiplayerPlayerToken") !== playerToken) {
+            return;
+        }
+
         multiplayerActionPending = false;
         turnText.textContent = "Reconnecting to the multiplayer draft...";
         multiplayerSocket.emit("rejoin-room", { roomId, playerToken }, response => {
             if(!response?.success){
-                turnText.textContent = response?.message || "Could not rejoin the draft room.";
+                multiplayerSession.clear({ clearTeams: true });
+                goTo("multiplayer.html");
                 return;
             }
 
             multiplayerSeat = response.seat;
             sessionStorage.setItem("multiplayerSeat", multiplayerSeat);
+
+            if (response.battle?.status === "finished") {
+                multiplayerSession.leave(multiplayerSocket, () => goTo("multiplayer.html"));
+                return;
+            }
+
+            if (response.battle) {
+                goTo("battle.html");
+                return;
+            }
+
+            if (response.heroState) {
+                goTo("hero-selection.html");
+                return;
+            }
+
             if(response.draftState)
                 renderMultiplayerDraft(response.draftState);
 
@@ -531,7 +554,21 @@ function startMultiplayerDraft(){
         });
     });
 
-    multiplayerSocket.on("draft-state", renderMultiplayerDraft);
+    multiplayerSocket.on("draft-state", state => {
+        if (state?.roomId === roomId)
+            renderMultiplayerDraft(state);
+    });
+
+    const handleRoomClosed = data => {
+        if (data?.roomId !== roomId) return;
+        if (multiplayerRedirectTimer) clearTimeout(multiplayerRedirectTimer);
+        multiplayerSession.clear({ clearTeams: true });
+        goTo("multiplayer.html");
+    };
+
+    multiplayerSocket.on("room-closed", handleRoomClosed);
+    multiplayerSocket.on("match-closed", handleRoomClosed);
+
     multiplayerSocket.on("disconnect", ()=>{
         multiplayerActionPending = false;
         turnText.textContent = "Connection lost. Reconnecting to the draft...";
@@ -575,7 +612,8 @@ function submitMultiplayerDraftAction(kwami){
 }
 
 function renderMultiplayerDraft(state){
-    if(!state || !Array.isArray(state.teams?.p1) || !Array.isArray(state.teams?.p2))
+    if(!state || state.roomId !== sessionStorage.getItem("multiplayerRoomId") ||
+        !Array.isArray(state.teams?.p1) || !Array.isArray(state.teams?.p2))
         return;
 
     const previousState = multiplayerDraftState;
@@ -630,7 +668,7 @@ function renderMultiplayerDraft(state){
 
         if(!multiplayerRedirectScheduled){
             multiplayerRedirectScheduled = true;
-            setTimeout(()=>goTo("./hero-selection.html"), 1800);
+            multiplayerRedirectTimer = setTimeout(()=>goTo("./hero-selection.html"), 1800);
         }
     }else if(state.currentAction){
         const activeName = playerNames[state.currentAction.seat] ||

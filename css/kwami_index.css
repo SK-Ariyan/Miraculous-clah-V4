@@ -586,3 +586,293 @@ background-attachment: fixed;
     --theme-secondary: #a66b42;
     --theme-dark: #392013;
 }
+
+@media (max-width: 1000px) and (orientation: landscape) and (pointer: coarse) {
+    body:has(#kwamiImage) #orientationOverlay {
+        display: none;
+    }
+
+    body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding:
+            max(8px, env(safe-area-inset-top))
+            max(8px, env(safe-area-inset-right))
+            max(10px, env(safe-area-inset-bottom))
+            max(8px, env(safe-area-inset-left));
+    }
+
+    body #backBtn {
+        top: max(6px, env(safe-area-inset-top));
+        left: max(6px, env(safe-area-inset-left));
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    body .container {
+        width: 100%;
+        max-width: 680px;
+        margin: 50px auto 0;
+        padding: 10px;
+        gap: 7px;
+        display: grid;
+        grid-template-columns: minmax(140px, 0.9fr) minmax(0, 1.3fr);
+        grid-template-areas:
+            "heading heading"
+            "navigation navigation"
+            "image active"
+            "favorite active"
+            "title synergy"
+            "passive synergy"
+            "stats stats"
+            "gallery gallery";
+        align-items: start;
+    }
+
+    body #backBtn {
+        top: max(6px, env(safe-area-inset-top));
+        left: max(6px, env(safe-area-inset-left));
+        min-width: 44px;
+        min-height: 44px;
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    body .container > h1 {
+        font-size: clamp(20px, 5.5vw, 24px);
+        line-height: 1.15;
+        letter-spacing: 0.5px;
+    }
+
+    body .navigation {
+        gap: 10px;
+        padding: 6px;
+    }
+
+    body .navigation h2 {
+        min-width: 0;
+        flex: 1 1 auto;
+        font-size: clamp(18px, 5vw, 21px);
+    }
+
+    body #prevBtn,
+    body #nextBtn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        flex: 0 0 44px;
+    }
+
+    body #kwamiImage {
+        width: 100%;
+        height: clamp(155px, 43vw, 190px);
+        min-height: 0;
+        padding: 8px;
+        border-width: 2px;
+        border-radius: 14px;
+    }
+
+    body #favoriteBtn {
+        min-height: 44px;
+        padding: 8px 6px;
+        font-size: 12px;
+        line-height: 1.2;
+    }
+
+    body #kwamiTitle {
+        font-size: 14px;
+        line-height: 1.25;
+    }
+
+    body .section {
+        min-width: 0;
+        padding: 9px 10px;
+        border-radius: 12px;
+    }
+
+    body .section h2 {
+        margin-bottom: 5px;
+        font-size: 15px;
+    }
+
+    body .section h3 {
+        margin-bottom: 4px;
+        font-size: 13px;
+    }
+
+    body .section h4 {
+        margin-bottom: 4px;
+        font-size: 12px;
+    }
+
+    body .section p {
+        font-size: 12px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    body #partnerImage {
+        width: 48px;
+        height: 48px;
+        margin: 2px 0;
+    }
+
+    body #stats {
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    body #kwamiStrip {
+        gap: 6px;
+        padding: 7px;
+    }
+
+    body #kwamiStrip img {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 360px) and (orientation: landscape) and (pointer: coarse) {
+    body .container {
+        display: grid;
+        grid-template-columns: minmax(130px, 0.9fr) minmax(0, 1fr);
+        grid-template-areas:
+            "heading heading"
+            "navigation navigation"
+            "image active"
+            "favorite active"
+            "title passive"
+            "synergy synergy"
+            "stats stats"
+            "gallery gallery";
+        align-items: start;
+        gap: 7px;
+        padding: 9px;
+    }
+
+    body .container > h1 {
+        font-size: 20px;
+    }
+
+    body .navigation {
+        width: 100%;
+    }
+
+    body #kwamiImage {
+        width: 100%;
+        height: 160px;
+    }
+
+    body #favoriteBtn {
+        width: 100%;
+        min-height: 44px;
+        padding: 7px 5px;
+        font-size: 12px;
+    }
+
+    body .section {
+        width: 100%;
+    }
+
+    body .section:has(#partnerImage),
+    body .section:has(#stats),
+    body #kwamiStrip {
+        width: 100%;
+    }
+
+    body .section:has(#partnerImage) {
+        grid-area: synergy;
+    }
+
+    body .section:has(#stats) {
+        grid-area: stats;
+    }
+}
+
+@media (max-width: 1000px) and (orientation: landscape) and (pointer: coarse) and (max-height: 500px) {
+    body {
+        min-height: 100vh;
+        min-height: 100dvh;
+        padding:
+            max(8px, env(safe-area-inset-top))
+            max(8px, env(safe-area-inset-right))
+            max(8px, env(safe-area-inset-bottom))
+            max(8px, env(safe-area-inset-left));
+    }
+
+    body .container {
+        width: 100%;
+        max-width: 1000px;
+        margin-top: 48px;
+        padding: 8px;
+        gap: 6px;
+        grid-template-columns: minmax(120px, 0.65fr) minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "heading heading heading"
+            "navigation navigation navigation"
+            "image active passive"
+            "favorite synergy stats"
+            "title synergy stats"
+            "gallery gallery gallery";
+    }
+
+    body .container > h1 {
+        font-size: clamp(18px, 4dvh, 22px);
+    }
+
+    body .navigation {
+        padding: 4px 6px;
+    }
+
+    body .navigation h2 {
+        font-size: 18px;
+    }
+
+    body #kwamiImage {
+        height: clamp(120px, 34dvh, 145px);
+    }
+
+    body #prevBtn,
+    body #nextBtn {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+        flex: 0 0 44px;
+    }
+
+    body #favoriteBtn {
+        min-height: 44px;
+    }
+
+    body .section {
+        padding: 7px 8px;
+    }
+
+    body .section h2 {
+        font-size: 14px;
+    }
+
+    body .section h3,
+    body .section h4 {
+        font-size: 12px;
+    }
+
+    body .section p,
+    body #stats {
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    body #partnerImage {
+        width: 40px;
+        height: 40px;
+    }
+
+    body #kwamiStrip img {
+        width: 44px;
+        height: 44px;
+    }
+}

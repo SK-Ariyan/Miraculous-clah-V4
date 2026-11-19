@@ -109,11 +109,24 @@
 </audio>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="../js/multiplayer/session.js"></script>
 <script>
 
 document.getElementById("backBtn").onclick = ()=>{
 
-    goTo("lobby.html");
+    if (sessionStorage.getItem("mode") !== "multiplayer") {
+        goTo("lobby.html");
+        return;
+    }
+
+    multiplayerSession.leave(multiplayerSocket, response => {
+        if (!response?.success) {
+            alert(response?.message || "Unable to leave the multiplayer room.");
+            return;
+        }
+
+        goTo("multiplayer.html");
+    });
 
 };
 
